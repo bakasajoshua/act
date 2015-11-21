@@ -16,7 +16,7 @@
 | environments.
 |
 */
-$config['base_url'] = 'http://'.$_SERVER['SERVER_NAME'].'/Sacco/';
+$config['base_url'] = 'http://'.$_SERVER['SERVER_NAME'].'/act/';
 
 /*
 |--------------------------------------------------------------------------
