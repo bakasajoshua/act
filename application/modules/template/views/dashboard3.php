@@ -75,38 +75,52 @@
 			<!-- end breadcrumb -->
 			<!-- begin page-header -->
 			<p>
-                <a href="javascript:history.back(-1);" class="btn btn-success">
-                    <i class="fa fa-arrow-circle-left"></i> Counties
-                </a>
+                <div class="row">
+                	<div class="col-md-4">
+					    <select class="form-control btn btn-primary" data-size="10" data-live-search="true" data-style="btn-danger">
+                            <option value="" selected>Select a Country</option>
+                            <option value="AF">Afghanistan</option>
+                            <option value="AL">Albania</option>
+                            <option value="DZ">Algeria</option>
+                            <option value="AS">American Samoa</option>
+                            <option value="AD">Andorra</option>
+                            <option value="AO">Angola</option>
+                            <option value="AI">Anguilla</option>
+                            <option value="AQ">Antarctica</option>
+                            <option value="AG">Antigua and Barbuda</option>
+                        </select>
+					</div>
+					<div class="col-md-4"><span class="label label-primary">{{ county }}</span></div>
+				</div>
             </p>
 			<!-- end page-header -->
 			<div class="row">
-				<div class="col-md-4">
+				<div class="col-md-6">
 					<div class="panel panel-inverse">
 			    	    <div class="panel-body" id="container1"></div>
 					</div>	
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-6">
 					<div class="panel panel-inverse">
 			    	    <div class="panel-body" id="container2"></div>
 					</div>	
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-6">
 					<div class="panel panel-inverse">
 			    	    <div class="panel-body"  id="container3"></div>
 					</div>	
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-6">
 					<div class="panel panel-inverse">
 			    	    <div class="panel-body" id="container4"></div>
 					</div>	
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-6">
 					<div class="panel panel-inverse">
 			    	    <div class="panel-body"  id="container5"></div>
 					</div>	
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-6">
 					<div class="panel panel-inverse">
 			    	    <div class="panel-body" id="container6"></div>
 					</div>	
@@ -195,6 +209,10 @@
 	<script src="<?php echo base_url();?>assets/js/apps.min.js"></script>
 	<script src="<?php echo base_url();?>assets/custom/js/chart-dash.js"></script>
 	<!-- ================== END PAGE LEVEL JS ================== -->
+	
+	<!-- ================== BEGIN CUSTOM JS ================== -->
+	<script src="<?php echo base_url();?>assets/custom/js/custom.js"></script>
+	<!-- ================== END CUSTOM JS ================== -->
 	<script>
 		$(document).ready(function() {
 			App.init();

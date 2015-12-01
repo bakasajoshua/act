@@ -22,16 +22,18 @@ class tests extends MY_Controller
 			$file_dir = $file['tmp_name'];
 			if (($handle = fopen("$file_dir", "r")) !== FALSE) {
 				while (($row_data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-					$county = $row_data[0];
-					$sql = "INSERT INTO `tst_counties` (`county_name`) VALUES ('$county')";
-					// echo $sql;die();
-					$this->db->query($sql);
+					$sheet_data[] = $row_data;
 				}
 			fclose($handle);
 			}
-
-			// echo "<pre>";print_r($sheet_data);
-			// $this->db->insert_batch('tst_counties',$sheet_data);
+			$this->load->library('../controllers/api');
+			$this->api->format_data($sheet_data);
+			// foreach ($sheet_data as $key => $value) {
+			// 	// echo "<pre>";print_r($value);die();
+			// 	$this->db->query("INSERT IGNORE INTO `counties` (`county_name`) VALUES ('".$value[0]."')");
+			// }
+			// $this->db->insert_batch('counties',$sheet_data);
+			redirect('tests/upload_csv');
 		}
 	}
 }

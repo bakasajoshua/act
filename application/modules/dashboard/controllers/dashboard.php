@@ -10,9 +10,10 @@ class dashboard extends MY_Controller
 		parent:: __construct();
 	}
 
-	function index()
+	function index($id=NULL)
 	{
-		$data = array('Joshua' => 'Bakasa', 'Joshua' => 'Bakasa' );
+		// $data = array('Joshua' => 'Bakasa', 'Joshua' => 'Bakasa' );
+		$data['counties'] = $this->select_county();
 
 		$this->template->dashboard($data);
 	}

@@ -19,6 +19,7 @@
 	<link href="<?php echo base_url();?>assets/css/style.min.css" rel="stylesheet" />
 	<link href="<?php echo base_url();?>assets/css/style-responsive.min.css" rel="stylesheet" />
 	<link href="<?php echo base_url();?>assets/css/theme/default.css" rel="stylesheet" id="theme" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/css/select2.min.css"></link>
 	<!-- ================== END BASE CSS STYLE ================== -->
 </head>
 <body>
@@ -75,72 +76,107 @@
 			<!-- end breadcrumb -->
 			<!-- begin page-header -->
 			<p>
-                <a href="javascript:history.back(-1);" class="btn btn-success">
-                    <i class="fa fa-arrow-circle-left"></i> Counties
-                </a>
+				<div class="row">
+					<div class="col-md-4">
+						<?php
+							echo $counties;
+						?>
+					</div>
+					<div class="col-md-4">
+						<span class="label label-info"></span>
+					</div>
+				</div>
+                
             </p>
 			<!-- end page-header -->
 			<div class="row">
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container1"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container2"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body"  id="container3"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container4"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body"  id="container5"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container6"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container7"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container8"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container9"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container10"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container11"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container12"></div>
-					</div>	
-				</div>
+				<ul class="nav nav-pills">
+						<li class="active label label-info"><a href="#default-tab-1" data-toggle="tab">Default Tab 1</a></li>
+						<li class="label label-info"><a href="#default-tab-2" data-toggle="tab">Default Tab 2</a></li>
+						<li class="label label-info"><a href="#default-tab-3" data-toggle="tab">Default Tab 3</a></li>
+						<li class="label label-info"><a href="#default-tab-4" data-toggle="tab">Default Tab 4</a></li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane fade active in" id="default-tab-1">
+							<div class="row">
+								<div class="col-md-4">
+									<div class="panel panel-inverse">
+							    	    <div class="panel-body" id="container1"></div>
+									</div>	
+								</div>
+								<div class="col-md-4">
+									<div class="panel panel-inverse">
+							    	    <div class="panel-body" id="container2"></div>
+									</div>	
+								</div>
+								<div class="col-md-4">
+									<div class="panel panel-inverse">
+							    	    <div class="panel-body"  id="container3"></div>
+									</div>	
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane fade active in" id="default-tab-2">
+							<div class="row">
+								<div class="col-md-4">
+									<div class="panel panel-inverse">
+							    	    <div class="panel-body" id="container4"></div>
+									</div>	
+								</div>
+								<div class="col-md-4">
+									<div class="panel panel-inverse">
+							    	    <div class="panel-body" id="container5"></div>
+									</div>	
+								</div>
+								<div class="col-md-4">
+									<div class="panel panel-inverse">
+							    	    <div class="panel-body" id="container6"></div>
+									</div>	
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane fade active in" id="default-tab-3">
+							<div class="row">
+								<div class="col-md-4">
+									<div class="panel panel-inverse">
+							    	    <div class="panel-body" id="container7"></div>
+									</div>	
+								</div>
+								<div class="col-md-4">
+									<div class="panel panel-inverse">
+							    	    <div class="panel-body" id="container8"></div>
+									</div>	
+								</div>
+								<div class="col-md-4">
+									<div class="panel panel-inverse">
+							    	    <div class="panel-body" id="container9"></div>
+									</div>	
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane fade active in" id="default-tab-4">
+							<div class="row">
+								<div class="col-md-4">
+									<div class="panel panel-inverse">
+							    	    <div class="panel-body" id="container10"></div>
+									</div>	
+								</div>
+								<div class="col-md-4">
+									<div class="panel panel-inverse">
+							    	    <div class="panel-body" id="container11"></div>
+									</div>	
+								</div>
+								<div class="col-md-4">
+									<div class="panel panel-inverse">
+							    	    <div class="panel-body" id="container12"></div>
+									</div>	
+								</div>
+							</div>
+						</div>
+					</div>
+				
+				
+				
 			</div>
 			
             
@@ -148,7 +184,7 @@
 		<!-- end #content -->
 		
 		<!-- begin theme-panel -->
-        <div class="theme-panel">
+        <!-- <div class="theme-panel">
             <a href="javascript:;" data-click="theme-panel-expand" class="theme-collapse-btn"><i class="fa fa-cog"></i></a>
             <div class="theme-panel-content">
                 <h5 class="m-t-0">Color Theme</h5>
@@ -198,7 +234,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <!-- end theme-panel -->
         
 		<!-- begin scroll to top btn -->
@@ -224,10 +260,16 @@
 	<!-- ================== BEGIN PAGE LEVEL JS ================== -->
 	<script src="<?php echo base_url();?>assets/js/apps.min.js"></script>
 	<script src="<?php echo base_url();?>assets/custom/js/chart-line.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script>
 	<!-- ================== END PAGE LEVEL JS ================== -->
+
+	<!-- ================== BEGIN CUSTOM JS ================== -->
+	<script src="<?php echo base_url();?>assets/custom/js/custom.js"></script>
+	<!-- ================== END CUSTOM JS ================== -->
 	<script>
 		$(document).ready(function() {
 			App.init();
+
 		});
 	</script>
 	
