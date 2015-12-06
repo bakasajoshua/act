@@ -1,277 +1,286 @@
-<!DOCTYPE html>
-<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
-<!--[if !IE]><!-->
-<html lang="en">
-<!--<![endif]-->
-<head>
-	<meta charset="utf-8" />
-	<title>1st Dashboard |National ACT Dashboard</title>
-	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
-	<meta content="" name="description" />
-	<meta content="" name="author" />
+<style type="text/css">
+	.input-group{
+		margin-bottom: 0.5em
+	}
+	#county-select {
+	    width: 168px;
+	    height: 30px;
+	}
+	#sub_county_select {
+		height: 30px;
+	}
+	#county-label{
+		height: 30px;
+		width: 306px;
+		color: white;
+		font-weight: 20px;
+		padding-left: 0.5em;
+		margin-left: 1em;
+		/*text: white;*/
+	}
+
+
+	.breadcrumb>li {
+	    line-height: 0;
+	}
+
+	.breadcrumb>li>a {
+		font-weight: 20px;
+	}
 	
-	<!-- ================== BEGIN BASE CSS STYLE ================== -->
-	<link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
-	<link href="<?php echo base_url();?>assets/plugins/jquery-ui-1.10.4/themes/base/minified/jquery-ui.min.css" rel="stylesheet" />
-	<link href="<?php echo base_url();?>assets/plugins/bootstrap-3.2.0/css/bootstrap.min.css" rel="stylesheet" />
-	<link href="<?php echo base_url();?>assets/plugins/font-awesome-4.2.0/css/font-awesome.min.css" rel="stylesheet" />
-	<link href="<?php echo base_url();?>assets/css/animate.min.css" rel="stylesheet" />
-	<link href="<?php echo base_url();?>assets/css/style.min.css" rel="stylesheet" />
-	<link href="<?php echo base_url();?>assets/css/style-responsive.min.css" rel="stylesheet" />
-	<link href="<?php echo base_url();?>assets/css/theme/default.css" rel="stylesheet" id="theme" />
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/css/select2.min.css"></link>
-	<!-- ================== END BASE CSS STYLE ================== -->
-</head>
-<body>
-	<!-- begin #page-loader -->
-	<div id="page-loader" class="fade in"><span class="spinner"></span></div>
-	<!-- end #page-loader -->
-	
-	<!-- begin #page-container -->
-	<div id="page-container" class="fade page-without-sidebar page-header-fixed">
-		<!-- begin #header -->
-		<div id="header" class="header navbar navbar-inverse navbar-fixed-top ">
-			<!-- begin container-fluid -->
-			<div class="container-fluid">
-				<!-- begin mobile sidebar expand / collapse button -->
-				<div class="navbar-header  bg-black">
-					<a href="index.html" class="navbar-brand"><span class="navbar-logo"></span>ACT</a>
-					<button type="button" class="navbar-toggle" data-click="sidebar-toggled">
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</button>
-				</div>
-				<!-- end mobile sidebar expand / collapse button -->
-				
-				<!-- begin header navigation right -->
-				<ul class="nav navbar-nav navbar-right">
-					<li class="active navbar navbar-nav">
-						<a href="<?php echo base_url();?>dashboard">1st Dashboard</a>
-					</li>
-					<li class="navbar navbar-nav">
-						<a href="<?php echo base_url();?>dashboard/dashboard2">2nd Dashboard</a>
-					</li>
-					<li class="navbar navbar-nav">
-						<a href="<?php echo base_url();?>dashboard/dashboard3">3rd Dashboard</a>
-					</li>
-						
-					
-				</ul>
-				<!-- end header navigation right -->
-				
-			</div>
-			<!-- end container-fluid -->
-		</div>
-		<!-- end #header -->
-		
-		<!-- begin #content -->
-		<div id="content" class="content">
-			<!-- begin breadcrumb -->
-			<ol class="breadcrumb pull-right">
-				<li><a href="javascript:;">Home</a></li>
-				<li><a href="javascript:;">Dashboard</a></li>
-				<li class="active">1st 90 Dashboard</li>
-			</ol>
-			<!-- end breadcrumb -->
-			<!-- begin page-header -->
-			<p>
-				<div class="row">
-					<div class="col-md-4">
+</style>
+<!-- begin #content -->
+<div id="content" class="content">
+	<!-- begin breadcrumb -->
+	<ol class="breadcrumb pull-right">
+		<li><a href="javascript:;">Home</a></li>
+		<li class="active">Dashboard</li>
+	</ol>
+	<!-- end breadcrumb -->
+	<!-- begin page-header -->
+	<p>
+		<div class="row">
+			<div class="col-md-4">
+				<form action="<?php echo base_url();?>dashboard/county" method="post" id="form">
+					<div class="input-group">
 						<?php
 							echo $counties;
 						?>
 					</div>
+					<div class="row input-group">
+						<div class="col-md-8" id="sub-county">
+							<select class="btn btn-info" name="sub_county_select" id="sub_county_select">
+								<option value="0">Select Sub County</option>
+							</select>
+						</div>
+						<div class="col-md-4">
+							<button style="height:30px;" class="btn btn-primary" type="submit"> Filter </button>
+						</div>
+						
+					</div>
+					
+				</form>
+			</div>
+			<div class="col-md-4">
+				<div class="row form-group" style="height: 40px;">
+					<div class="col-md-9">
+	                    <div class="input-group input-daterange">
+	                        <input type="text" class="form-control" name="start" placeholder="Date Start" />
+	                        <span class="input-group-addon">to</span>
+	                        <input type="text" class="form-control" name="end" placeholder="Date End" />
+	                    </div>
+                    </div>
+                    <div class="col-md-3">
+	                    <button style="height:30px;" class="btn btn-primary" type="submit"> Filter </button>
+                    </div>
+
+                </div>
+                <div class="row">
+                	<div class="label-info" id="county-label">
+                		<center>
+                			<ol class="breadcrumb">
+								<?php
+									echo $breadcrumb;
+								?>
+							</ol>
+						</center>
+					</div>
+                </div>
+                
+                
+			</div>
+		</div>
+        
+    </p>
+	<!-- end page-header -->
+	<!-- begin tabs -->
+	<div class="col-md-12">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="#default-tab-1" data-toggle="tab">1st-90 Dashboard</a></li>
+			<li class=""><a href="#default-tab-2" data-toggle="tab">2nd-90 Dashboard</a></li>
+			<li class=""><a href="#default-tab-3" data-toggle="tab">3rd-90 Dashboard</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane fade active in" id="default-tab-1">
+				<div class="row">
 					<div class="col-md-4">
-						<span class="label label-info"></span>
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container1"></div>
+						</div>	
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container2"></div>
+						</div>	
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body"  id="container3"></div>
+						</div>	
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container4"></div>
+						</div>	
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container5"></div>
+						</div>	
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container6"></div>
+						</div>	
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container7"></div>
+						</div>	
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container8"></div>
+						</div>	
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container9"></div>
+						</div>	
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container10"></div>
+						</div>	
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container11"></div>
+						</div>	
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container12"></div>
+						</div>	
+					</div>
+					
+				</div>
+			</div>
+			<div class="tab-pane fade" id="default-tab-2">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container13"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container14"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body"  id="container15"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container16"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body"  id="container17"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container18"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container19"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container20"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container21"></div>
+						</div>	
 					</div>
 				</div>
-                
-            </p>
-			<!-- end page-header -->
-			<div class="row">
-				<ul class="nav nav-pills">
-						<li class="active label label-info"><a href="#default-tab-1" data-toggle="tab">Default Tab 1</a></li>
-						<li class="label label-info"><a href="#default-tab-2" data-toggle="tab">Default Tab 2</a></li>
-						<li class="label label-info"><a href="#default-tab-3" data-toggle="tab">Default Tab 3</a></li>
-						<li class="label label-info"><a href="#default-tab-4" data-toggle="tab">Default Tab 4</a></li>
-					</ul>
-					<div class="tab-content">
-						<div class="tab-pane fade active in" id="default-tab-1">
-							<div class="row">
-								<div class="col-md-4">
-									<div class="panel panel-inverse">
-							    	    <div class="panel-body" id="container1"></div>
-									</div>	
-								</div>
-								<div class="col-md-4">
-									<div class="panel panel-inverse">
-							    	    <div class="panel-body" id="container2"></div>
-									</div>	
-								</div>
-								<div class="col-md-4">
-									<div class="panel panel-inverse">
-							    	    <div class="panel-body"  id="container3"></div>
-									</div>	
-								</div>
-							</div>
-						</div>
-						<div class="tab-pane fade active in" id="default-tab-2">
-							<div class="row">
-								<div class="col-md-4">
-									<div class="panel panel-inverse">
-							    	    <div class="panel-body" id="container4"></div>
-									</div>	
-								</div>
-								<div class="col-md-4">
-									<div class="panel panel-inverse">
-							    	    <div class="panel-body" id="container5"></div>
-									</div>	
-								</div>
-								<div class="col-md-4">
-									<div class="panel panel-inverse">
-							    	    <div class="panel-body" id="container6"></div>
-									</div>	
-								</div>
-							</div>
-						</div>
-						<div class="tab-pane fade active in" id="default-tab-3">
-							<div class="row">
-								<div class="col-md-4">
-									<div class="panel panel-inverse">
-							    	    <div class="panel-body" id="container7"></div>
-									</div>	
-								</div>
-								<div class="col-md-4">
-									<div class="panel panel-inverse">
-							    	    <div class="panel-body" id="container8"></div>
-									</div>	
-								</div>
-								<div class="col-md-4">
-									<div class="panel panel-inverse">
-							    	    <div class="panel-body" id="container9"></div>
-									</div>	
-								</div>
-							</div>
-						</div>
-						<div class="tab-pane fade active in" id="default-tab-4">
-							<div class="row">
-								<div class="col-md-4">
-									<div class="panel panel-inverse">
-							    	    <div class="panel-body" id="container10"></div>
-									</div>	
-								</div>
-								<div class="col-md-4">
-									<div class="panel panel-inverse">
-							    	    <div class="panel-body" id="container11"></div>
-									</div>	
-								</div>
-								<div class="col-md-4">
-									<div class="panel panel-inverse">
-							    	    <div class="panel-body" id="container12"></div>
-									</div>	
-								</div>
-							</div>
-						</div>
-					</div>
-				
-				
 				
 			</div>
-			
-            
+			<div class="tab-pane fade" id="default-tab-3">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container22"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container23"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body"  id="container24"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container25"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body"  id="container26"></div>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="container27"></div>
+						</div>	
+					</div>
+				</div>
+			</div>
 		</div>
-		<!-- end #content -->
-		
-		<!-- begin theme-panel -->
-        <!-- <div class="theme-panel">
-            <a href="javascript:;" data-click="theme-panel-expand" class="theme-collapse-btn"><i class="fa fa-cog"></i></a>
-            <div class="theme-panel-content">
-                <h5 class="m-t-0">Color Theme</h5>
-                <ul class="theme-list clearfix">
-                    <li class="active"><a href="javascript:;" class="bg-green" data-theme="default" data-click="theme-selector" data-toggle="tooltip" data-trigger="hover" data-container="body" data-title="Default">&nbsp;</a></li>
-                    <li><a href="javascript:;" class="bg-red" data-theme="red" data-click="theme-selector" data-toggle="tooltip" data-trigger="hover" data-container="body" data-title="Red">&nbsp;</a></li>
-                    <li><a href="javascript:;" class="bg-blue" data-theme="blue" data-click="theme-selector" data-toggle="tooltip" data-trigger="hover" data-container="body" data-title="Blue">&nbsp;</a></li>
-                    <li><a href="javascript:;" class="bg-purple" data-theme="purple" data-click="theme-selector" data-toggle="tooltip" data-trigger="hover" data-container="body" data-title="Purple">&nbsp;</a></li>
-                    <li><a href="javascript:;" class="bg-orange" data-theme="orange" data-click="theme-selector" data-toggle="tooltip" data-trigger="hover" data-container="body" data-title="Orange">&nbsp;</a></li>
-                    <li><a href="javascript:;" class="bg-black" data-theme="black" data-click="theme-selector" data-toggle="tooltip" data-trigger="hover" data-container="body" data-title="Black">&nbsp;</a></li>
-                </ul>
-                <div class="divider"></div>
-                <div class="row m-t-10">
-                    <div class="col-md-5 control-label double-line">Header Styling</div>
-                    <div class="col-md-7">
-                        <select name="header-styling" class="form-control input-sm">
-                            <option value="1">default</option>
-                            <option value="2">inverse</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row m-t-10">
-                    <div class="col-md-5 control-label">Header</div>
-                    <div class="col-md-7">
-                        <select name="header-fixed" class="form-control input-sm">
-                            <option value="1">fixed</option>
-                            <option value="2">default</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row m-t-10">
-                    <div class="col-md-5 control-label double-line">Sidebar Styling</div>
-                    <div class="col-md-7">
-                        <select name="sidebar-styling" class="form-control input-sm">
-                            <option value="1">default</option>
-                            <option value="2">grid</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row m-t-10">
-                    <div class="col-md-5 control-label">Sidebar</div>
-                    <div class="col-md-7">
-                        <select name="sidebar-fixed" class="form-control input-sm">
-                            <option value="1">fixed</option>
-                            <option value="2">default</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-        <!-- end theme-panel -->
-        
-		<!-- begin scroll to top btn -->
-		<a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade" data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
-		<!-- end scroll to top btn -->
 	</div>
-	<!-- end page container -->
-	
-	<!-- ================== BEGIN BASE JS ================== -->
-	<script src="<?php echo base_url();?>assets/plugins/jquery-1.8.2/jquery-1.8.2.min.js"></script>
-	<script src="<?php echo base_url();?>assets/plugins/jquery-ui-1.10.4/ui/minified/jquery-ui.min.js"></script>
-	<script src="<?php echo base_url();?>assets/plugins/bootstrap-3.2.0/js/bootstrap.min.js"></script>
-	<script src="<?php echo base_url();?>assets/plugins/highcharts/js/highcharts.js"></script>
-	<!--[if lt IE 9]>
-		<script src="assets/crossbrowserjs/html5shiv.js"></script>
-		<script src="assets/crossbrowserjs/respond.min.js"></script>
-		<script src="assets/crossbrowserjs/excanvas.min.js"></script>
-	<![endif]-->
-	<script src="<?php echo base_url();?>assets/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-	<script src="<?php echo base_url();?>assets/plugins/jquery-cookie/jquery.cookie.js"></script>
-	<!-- ================== END BASE JS ================== -->
-	
-	<!-- ================== BEGIN PAGE LEVEL JS ================== -->
-	<script src="<?php echo base_url();?>assets/js/apps.min.js"></script>
-	<script src="<?php echo base_url();?>assets/custom/js/chart-line.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script>
-	<!-- ================== END PAGE LEVEL JS ================== -->
-
-	<!-- ================== BEGIN CUSTOM JS ================== -->
-	<script src="<?php echo base_url();?>assets/custom/js/custom.js"></script>
-	<!-- ================== END CUSTOM JS ================== -->
-	<script>
-		$(document).ready(function() {
-			App.init();
-
+	<!-- end tabs -->
+    
+</div>
+<!-- end #content -->
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('#sub-county').hide(0);
+		$('#county-select').change(function(){
+			id=$(this).val();
+			if (id==0) {
+				$('#sub-county').hide();
+			} else{
+				$('#sub-county').show();
+				$('#sub_county_select').children('#removable').remove();
+				$.get('<?php base_url();?>dashboard/ajax_get_sub_county/'+id, function(data){
+					obj=jQuery.parseJSON(data);
+					
+					$.each(obj, function(index, value){
+						$('#sub_county_select').append('<option id="removable" value="'+value.sub_county_ID+'">'+value.sub_county_name+'</option>');
+						// console.log(value.sub_county_name);
+					});
+				});
+			}
+			
 		});
-	</script>
-	
-</body>
-</html>
+	});
+</script>
+<?php 
+	$this->load->view('dropdown');
+	$this->load->view('dash_2');
+?>
+

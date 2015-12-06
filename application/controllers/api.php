@@ -74,7 +74,8 @@ class api extends MX_Controller
 	}
 
 	function calculate_dhis_tests($data){
-			
+			$cumulative_children=0;
+			$cumulative_adults=0;
         foreach ($data as $key => $value) {
         	$test_sum[0] = ($value['vctclientstested(15-24yrs,female)']+$value['vctclientstested(female,_gt25yrs)']+$value['vctclientstested(15-24yrs,male)']+$value['vctclientstested(male,_gt25yrs)']+$value['dtcinpatienttested(male,adult_gt14yrs)']+$value['dtcoutpatienttested(male,adult_gt14yrs)']+$value['dtcoutpatienttested(female,adult_gt14yrs)']);
 			$test_sum[1] = ($value['dtcinpatienttested(female,adult_gt14yrs)']+$value['anchivtests']+$value['labouranddelivery']+$value['postnatal(within72']);
@@ -99,13 +100,19 @@ class api extends MX_Controller
 				  		'dtc_inmale_lt14' => $value['dtcoutpatienttested(male,children_lt14yrs)'],
 				  		'dtc_outmale_lt14' => $value['dtcinpatienttested(male,children_lt14yrs)']
 					);
+			$total_children = ($value['dtcinpatienttested(female,children_lt14yrs)']+$value['dtcoutpatienttested(female,children_lt14yrs)']+$value['dtcoutpatienttested(male,children_lt14yrs)']+$value['dtcinpatienttested(male,children_lt14yrs)']);
+			$total_adults = ($test_sum[0]+$test_sum[1]);
+			$cumulative_children = $cumulative_children+$total_children;
+			$cumulative_adults = $cumulative_adults+$total_adults;
 			$dhis_tests[1] = array(
 				  		'county_ID' => $value['organisationunitname'],
 						'sub_county_ID' => $value['organisationunitname'],
 						'facility_ID' => $value['organisationunitname'],
 						'period' => $value['periodname'],
-						'total_children' => ($value['dtcinpatienttested(female,children_lt14yrs)']+$value['dtcoutpatienttested(female,children_lt14yrs)']+$value['dtcoutpatienttested(male,children_lt14yrs)']+$value['dtcinpatienttested(male,children_lt14yrs)']),
-						'total_adults' => ($test_sum[0]+$test_sum[1])
+						'total_children' => $total_children,
+						'total_adults' => ($test_sum[0]+$test_sum[1]),
+						'cum_children' => $cumulative_children,
+						'cum_adults' => $cumulative_adults,
 					);
 			$tests[] = $dhis_tests;
         }

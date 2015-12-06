@@ -19,6 +19,11 @@
 	<link href="<?php echo base_url();?>assets/css/style.min.css" rel="stylesheet" />
 	<link href="<?php echo base_url();?>assets/css/style-responsive.min.css" rel="stylesheet" />
 	<link href="<?php echo base_url();?>assets/css/theme/default.css" rel="stylesheet" id="theme" />
+	<link href="<?php echo base_url();?>assets/custom/css/custom.css" rel="stylesheet" />
+	<link href="<?php echo base_url();?>assets/plugins/bootstrap-datepicker/css/datepicker.css" rel="stylesheet" />
+	<link href="<?php echo base_url();?>assets/plugins/bootstrap-datepicker/css/datepicker3.css" rel="stylesheet" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/css/select2.min.css"></link>
+	<script src="<?php echo base_url();?>assets/plugins/jquery-1.8.2/jquery-1.8.2.min.js"></script>
 	<!-- ================== END BASE CSS STYLE ================== -->
 </head>
 <body>
@@ -44,110 +49,32 @@
 				<!-- end mobile sidebar expand / collapse button -->
 				
 				<!-- begin header navigation right -->
-				<ul class="nav navbar-nav navbar-right">
-					<li class="navbar navbar-nav">
-						<a href="<?php echo base_url();?>dashboard">1st Dashboard</a>
-					</li>
+				<!-- <ul class="nav navbar-nav navbar-right">
 					<li class="active navbar navbar-nav">
-						<a href="<?php echo base_url();?>dashboard/dashboard2">2nd Dashboard</a>
+						<a href="<?php// echo base_url();?>dashboard">1st Dashboard</a>
 					</li>
 					<li class="navbar navbar-nav">
-						<a href="<?php echo base_url();?>dashboard/dashboard3">3rd Dashboard</a>
+						<a href="<?php// echo base_url();?>dashboard/dashboard2">2nd Dashboard</a>
+					</li>
+					<li class="navbar navbar-nav">
+						<a href="<?php// echo base_url();?>dashboard/dashboard3">3rd Dashboard</a>
 					</li>
 						
 					
-				</ul>
+				</ul> -->
 				<!-- end header navigation right -->
 				
 			</div>
 			<!-- end container-fluid -->
 		</div>
 		<!-- end #header -->
+		<?php
+			$this->load->view('dashboard');
+		?>
 		
-		<!-- begin #content -->
-		<div id="content" class="content">
-			<!-- begin breadcrumb -->
-			<ol class="breadcrumb pull-right">
-				<li><a href="javascript:;">Home</a></li>
-				<li><a href="javascript:;">Dashboard</a></li>
-				<li class="active">2nd 90 Dashboard</li>
-			</ol>
-			<!-- end breadcrumb -->
-			<!-- begin page-header -->
-			<p>
-                <div class="row">
-                	<div class="col-md-4"></div>
-					<div class="col-md-4">
-					    <select class="form-control btn btn-primary" data-size="10" data-live-search="true" data-style="btn-danger">
-                            <option value="" selected>Select a Country</option>
-                            <option value="AF">Afghanistan</option>
-                            <option value="AL">Albania</option>
-                            <option value="DZ">Algeria</option>
-                            <option value="AS">American Samoa</option>
-                            <option value="AD">Andorra</option>
-                            <option value="AO">Angola</option>
-                            <option value="AI">Anguilla</option>
-                            <option value="AQ">Antarctica</option>
-                            <option value="AG">Antigua and Barbuda</option>
-                        </select>
-					</div>
-				</div>
-            </p>
-			<!-- end page-header -->
-			<div class="row">
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container1"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container2"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body"  id="container3"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container4"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body"  id="container5"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container6"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container7"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container8"></div>
-					</div>	
-				</div>
-				<div class="col-md-4">
-					<div class="panel panel-inverse">
-			    	    <div class="panel-body" id="container9"></div>
-					</div>	
-				</div>
-			</div>
-			
-            
-		</div>
-		<!-- end #content -->
 		
 		<!-- begin theme-panel -->
-        <div class="theme-panel">
+        <!-- <div class="theme-panel">
             <a href="javascript:;" data-click="theme-panel-expand" class="theme-collapse-btn"><i class="fa fa-cog"></i></a>
             <div class="theme-panel-content">
                 <h5 class="m-t-0">Color Theme</h5>
@@ -197,7 +124,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <!-- end theme-panel -->
         
 		<!-- begin scroll to top btn -->
@@ -207,7 +134,7 @@
 	<!-- end page container -->
 	
 	<!-- ================== BEGIN BASE JS ================== -->
-	<script src="<?php echo base_url();?>assets/plugins/jquery-1.8.2/jquery-1.8.2.min.js"></script>
+	
 	<script src="<?php echo base_url();?>assets/plugins/jquery-ui-1.10.4/ui/minified/jquery-ui.min.js"></script>
 	<script src="<?php echo base_url();?>assets/plugins/bootstrap-3.2.0/js/bootstrap.min.js"></script>
 	<script src="<?php echo base_url();?>assets/plugins/highcharts/js/highcharts.js"></script>
@@ -222,15 +149,18 @@
 	
 	<!-- ================== BEGIN PAGE LEVEL JS ================== -->
 	<script src="<?php echo base_url();?>assets/js/apps.min.js"></script>
-	<script src="<?php echo base_url();?>assets/custom/js/chart-bars.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script>
 	<!-- ================== END PAGE LEVEL JS ================== -->
-	
+
 	<!-- ================== BEGIN CUSTOM JS ================== -->
+	<script src="<?php echo base_url();?>assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
 	<script src="<?php echo base_url();?>assets/custom/js/custom.js"></script>
+	<script src="<?php echo base_url();?>assets/js/form-plugins.demo.min.js"></script>
 	<!-- ================== END CUSTOM JS ================== -->
 	<script>
 		$(document).ready(function() {
 			App.init();
+			FormPlugins.init();
 		});
 	</script>
 	
