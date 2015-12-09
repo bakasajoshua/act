@@ -23,6 +23,8 @@
 	<link href="<?php echo base_url();?>assets/plugins/bootstrap-datepicker/css/datepicker.css" rel="stylesheet" />
 	<link href="<?php echo base_url();?>assets/plugins/bootstrap-datepicker/css/datepicker3.css" rel="stylesheet" />
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/css/select2.min.css"></link>
+	<link rel="icon" sizes="196x196" href="<?php echo base_url();?>assets/img/favicon.gif">
+	<link rel="apple-touch-icon-precomposed" sizes="196x196" href="<?php echo base_url();?>assets/img/favicon.gif">
 	<script src="<?php echo base_url();?>assets/plugins/jquery-1.8.2/jquery-1.8.2.min.js"></script>
 	<!-- ================== END BASE CSS STYLE ================== -->
 </head>
