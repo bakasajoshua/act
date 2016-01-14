@@ -11,9 +11,157 @@ class api_model extends CI_Model
 		parent:: __construct();
 	}
 
+    function get_county_names()
+    {
+        foreach ($this->counties() as $key => $value)
+            $new_db_counties[] = $value['county_name'];
+        
+        return $new_db_counties;
+    }
+
 	function counties()
     {
+        /*
+        *When using this function to compare county names,
+        *always use str_replace(" ","",$string) to remove whitespace that comes with the county_name
+        */
         return $this->db->get('counties')->result_array();
+    }
+
+    function insert_sub_counties($data){
+        foreach ($data as $key => $value) {
+            $sub_county_name = $value['sub_county_name'];
+            $county_ID = $value['county_ID'];
+            $insert = $this->db->query("INSERT IGNORE INTO `sub_counties` (`sub_county_name`,`county_ID`) VALUES('$sub_county_name','$county_ID')");
+        }
+        return $insert;
+    }
+
+    function formatting_eid_data($data,$year,$month){
+        $sub_counties = $this->db->get('sub_counties')->result_array();
+        // echo "<pre>";print_r($data);die();
+        foreach ($data as $key => $value) {
+            foreach ($sub_counties as $k => $v) {
+                if ($value['SubCounty']==$v['sub_county_name']) {
+                    $value['County'] = $v['county_ID'];
+                    $value['SubCounty'] = $v['sub_county_ID'];
+                    $value['period'] = $year."-".$month."-".$this->config->item('eid_report_day');
+                    $new_array[] = $value;
+                }
+            }
+        }
+
+        $facility = $this->add_facility($new_array);
+
+        if ($facility) {
+            $facilities = $this->db->get('facilities')->result_array();
+            foreach ($new_array as $key => $value) {
+                foreach ($facilities as $k => $v) {
+                    if ($value['MFL']==$v['MFL_Code']) {
+                        $value['Facility'] = $v['facility_ID'];
+                        $insert_array[] = $value;
+                    }
+                }
+            }
+
+            $insert = $this->adding_eid_data($insert_array);
+        }
+
+        $eid_calc = $this->calculate_eid_data($insert_array,$year,$month);
+
+        return $insert;
+        
+    }
+
+    function adding_eid_data($data)
+    {
+        foreach ($data as $key => $value) {
+            $insertion = array(
+                        'county_ID' => $value['County'],
+                        'sub_county_ID' => $value['SubCounty'],
+                        'facility_ID' => $value['Facility'],
+                        'MFL' => $value['MFL'],
+                        'period' => $value['period'],
+                        'test' => $value['Test'],
+                        'negative' => $value['Neg'],
+                        'positive' => $value['Pos'],
+                        'onTx' => $value['OnTx'],
+                        'invalid' => $value['Invalid']
+                    );
+            $insert = $this->db->insert('eid', $insertion);
+        }
+
+        return $insert;
+    }
+
+    function calculate_eid_data($data,$year,$month)
+    {
+        //Gets the data already calculated
+        $eid_calculated = $this->db->get('eid_calc')->result_array();
+        
+        //If this is not the first time running this function,
+        //      performs an aggregation from that basis
+        if ($eid_calculated) {
+
+            //foreach loop that performs the cumulative addition
+                foreach ($data as $key => $value) {
+                    //Getting the calculated values from the latest reported month of the year for the current Sub County
+                    $sub_county = $value['sub_county_ID'];
+                    $aggregates = $this->db->query("SELECT * FROM `eid_calc` WHERE `sub_county_ID` = '$sub_county' AND YEAR(`period`) = '$year' AND `period` = (SELECT MAX(`period`) FROM `eid_calc`)")->result_array();
+                }
+
+            $insertion = $this->add_eid_calculatedData($new_aggregate);
+        }
+        //If it is the first time running this function,
+        //      take the values just added and do the aggregation from that basis
+        else {
+            $eid = $this->db->query("SELECT
+                                        `county_ID`,
+                                        `sub_county_ID`,
+                                        `period`,
+                                        SUM(`test`) AS `test`,
+                                        SUM(`negative`) AS `negative`,
+                                        SUM(`positive`) AS `positive`,
+                                        SUM(`onTx`) AS `onTx`,
+                                        SUM(`invalid`) AS `invalid`
+                                    FROM `eid`
+                                    GROUP BY `sub_county_ID`")->result_array();
+            
+            $insertion = $this->add_eid_calculatedData($eid);
+            
+        }
+
+        return $insertion;
+        
+    }
+
+    function add_eid_calculatedData($data)
+    {
+        foreach ($data as $key => $value) {
+                $insert = array(
+                                'county_ID' => $value['county_ID'],
+                                'sub_county_ID' => $value['sub_county_ID'],
+                                'period' => $value['period'],
+                                'cumulative_test' => $value['test'],
+                                'cumulative_negative' => $value['negative'],
+                                'cumulative_positive' => $value['positive'],
+                                'cumulative_onTx' => $value['onTx'],
+                                'cumulative_invalid' => $value['invalid']);
+
+                $insertion = $this->db->insert('eid_calc', $insert);
+            }
+        return $insertion;
+    }
+
+    function add_facility($data)
+    {
+        foreach ($data as $key => $value) {
+            $mfl = $value['MFL'];
+            $facility = $value['Facility'];
+            $sub_county_ID = $value['SubCounty'];
+            $insert = $this->db->query("INSERT IGNORE INTO `facilities` (`MFL_Code`, `facility_name`, `sub_county_ID`) VALUES ('$mfl', '$facility', '$sub_county_ID')");
+        }
+        return $insert;
     }
     
     function dhis_insert_aggregation($data){

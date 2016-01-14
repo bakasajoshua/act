@@ -9,32 +9,37 @@ class dashboard extends MY_Controller
 	{
 		parent:: __construct();
 		$this->load->model('dashboard_model');
+		$this->load->module('charts');
 	}
 
 	function index()
 	{
+		$this->set_session_data();
 		$data = array();
 		$id=array('county_ID' => 0);
+		$filter = $this->filter(NULL);
+		
+		//Data array to be displayed
 		$data['counties'] = $this->select_county();
-		$data['chart']= $this->dashboard_model->county_chart($id);
+		$data['chart']= $this->charts->first_dashboard($id);
 		$data['breadcrumb'] = $this->breadcrumb($id);
 
 		// echo "<pre>";print_r($data);die();
 		$this->template->dashboard($data);
 	}
 
-	function county()
+	function county($year=NULL)
 	{
-		if ($this->input->post('sub_county_select')==0) {
-			$id = array('county_ID' => $this->input->post('county_name'),'sub_county_ID' => NULL);
-		} else {
-			$id = array('county_ID' => $this->input->post('county_name'),'sub_county_ID' => $this->input->post('sub_county_select') );
-		}
-		// echo "<pre>";print_r($id);die();
-		$data['breadcrumb'] = $this->breadcrumb($id);
-		$data['counties'] = $this->select_county();
-		$data['chart'] = $this->dashboard_model->county_chart($id);
+		if ($year==NULL)
+			$filter = $this->filter($this->session->userdata('year'));
+		else
+			$filter = $this->filter($year);
 		
+		//Data array to be displayed
+		$data['breadcrumb'] = $this->breadcrumb();
+		$data['counties'] = $this->select_county();
+		$data['chart'] = $this->charts->first_dashboard();
+		// echo "<pre>";print_r($data);die();
 		$this->template->dashboard($data);
 	}
 
@@ -44,23 +49,23 @@ class dashboard extends MY_Controller
 		echo json_encode($sub);
 	}
 
-	function breadcrumb($data)
+	function breadcrumb()
 	{
 
 		$li='';
-		if ($data['county_ID']==0||$data['county_ID']==NULL||$data['county_ID']==FALSE) {
-			$li = '<li><a href="javascript:;">Kenya</a></li>';
-		} else if ($data['sub_county_ID']==0||$data['county_ID']==NULL||$data['county_ID']==FALSE) {
-			$county = $this->dashboard_model->get_single_county($data['county_ID']);
+		if ($this->session->userdata('county_ID')==0||$this->session->userdata('county_ID')==NULL||$this->session->userdata('county_ID')==FALSE) {
+			$li = '<li><a href="javascript:;">Kenya|&nbsp;&nbsp;('.$this->session->userdata('year').')&nbsp;&nbsp;</a></li>';
+		} else if ($this->session->userdata('sub_county_ID')==0||$this->session->userdata('sub_county_ID')==NULL||$this->session->userdata('sub_county_ID')==FALSE) {
+			$county = $this->dashboard_model->get_single_county($this->session->userdata('county_ID'));
 			// echo "<pre>";print_r($data);die();
 			$li .= '<li><a href="javascript:;">Kenya</a></li>';
-			$li .= '<li><a href="javascript:;">'.$county[0]['county_name'].'</a></li>';
+			$li .= '<li><a href="javascript:;">'.$county[0]['county_name'].'|&nbsp;&nbsp;('.$this->session->userdata('year').')&nbsp;&nbsp;</a></li>';
 		} else {
-			$sub_county = $this->dashboard_model->get_single_sub_county($data['sub_county_ID']);
+			$sub_county = $this->dashboard_model->get_single_sub_county($this->session->userdata('county_ID'));
 			// echo "<pre>";print_r($sub_county);die();
 			$li .= '<li><a href="javascript:;">Kenya</a></li>';
 			$li .= '<li><a href="javascript:;">'.$sub_county[0]['county_name'].'</a></li>';
-			$li .= '<li><a href="javascript:;">'.$sub_county[0]['sub_county_name'].'</a></li>';
+			$li .= '<li><a href="javascript:;">'.$sub_county[0]['sub_county_name'].'|&nbsp;&nbsp;('.$this->session->userdata('year').')&nbsp;&nbsp;</a></li>';
 		}
 		return $li;
 	}

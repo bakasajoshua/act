@@ -1,4 +1,45 @@
 <style type="text/css">
+	
+	ul.tabbed {
+	    display: inline;
+	    margin: 0;
+	}
+
+	ul {
+	    list-style-type: disc;
+
+	}
+
+	ul li {
+		display: inline;
+	}
+
+	ul li .tab {
+		padding-left: 0;
+		margin-left: 0;
+	}
+
+	/*html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, code, del, dfn, em, img, q, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, textarea, input, select {
+	    margin: 0;
+	    padding: 0;
+	    border: 0;
+	    font-weight: inherit;
+	    font-style: inherit;
+	    font-size: 100%;
+	    font-family: inherit;
+	    vertical-align: baseline;
+	}
+
+	ul, menu, dir {
+    display: block;
+    list-style-type: disc;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    -webkit-padding-start: 40px;
+}*/
+
 	.input-group{
 		margin-bottom: 0.5em
 	}
@@ -61,19 +102,9 @@
 					
 				</form>
 			</div>
-			<div class="col-md-4">
-				<div class="row form-group" style="height: 40px;">
-					<div class="col-md-9">
-	                    <div class="input-group input-daterange">
-	                        <input type="text" class="form-control" name="start" placeholder="Date Start" />
-	                        <span class="input-group-addon">to</span>
-	                        <input type="text" class="form-control" name="end" placeholder="Date End" />
-	                    </div>
-                    </div>
-                    <div class="col-md-3">
-	                    <button style="height:30px;" class="btn btn-primary" type="submit"> Filter </button>
-                    </div>
-
+			<div class="col-md-8">
+				<div style="padding-bottom: 20px;">
+	                <?php echo $year_filter;?>
                 </div>
                 <div class="row">
                 	<div class="label-info" id="county-label">
@@ -86,9 +117,7 @@
 						</center>
 					</div>
                 </div>
-                
-                
-			</div>
+            </div>
 		</div>
         
     </p>

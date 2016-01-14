@@ -1,3 +1,4 @@
+
 <script type="text/javascript">
 	$(function () {
         $('#container1').highcharts({
@@ -32,13 +33,7 @@
                 verticalAlign: 'middle',
                 borderWidth: 0
             },
-            series: [{
-                name: 'Infants tested',
-                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
-            }, {
-                name: 'HIV +ve',
-                data: [-0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
-            }]
+            series: <?php echo json_encode($chart['infants_cumulative_test_positive']['infant_tspos']);?>
         });
     });
 
@@ -75,14 +70,14 @@ $(function () {
                 verticalAlign: 'middle',
                 borderWidth: 0
             },
-            series: <?php echo json_encode($chart['cumulative_test_positive']['child_tspos']);?>
+            series: <?php echo json_encode($chart['children_cumulative_test_positive']['child_tspos']);?>
         });
     });
 
 $(function () {
         $('#container3').highcharts({
             title: {
-                text: 'Cumulative: Number of Children Tested for HIV',
+                text: 'Cumulative: Number of Adults Tested for HIV',
                 x: -20 //center
             },
             subtitle: {
@@ -95,7 +90,7 @@ $(function () {
             },
             yAxis: {
                 title: {
-                    text: 'Temperature (°C)'
+                    text: 'Values'
                 },
                 plotLines: [{
                     value: 0,
@@ -112,13 +107,8 @@ $(function () {
                 verticalAlign: 'middle',
                 borderWidth: 0
             },
-            series: [{
-                name: 'Adults tested',
-                data: [7.0, 14.0, 19.5, 21.5, 25.2, 28.5, 32.2, 36.5, 39.3, 42.3, 45.9, 49.6]
-            }, {
-                name: 'HIV +ve',
-                data: [0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
-            }]
+            series: <?php echo json_encode($chart['adults_cumulative_test_positive']['adult_tspos']);?>
+            
         });
     });
 
@@ -174,23 +164,7 @@ $(function () {
                 floating: true,
                 backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
             },
-            series: [{
-                name: 'Infants Positive',
-                type: 'column',
-                yAxis: 1,
-                data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4],
-                tooltip: {
-                    valueSuffix: 'v'
-                }
-    
-            }, {
-                name: 'Infant Positivity',
-                type: 'spline',
-                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6],
-                tooltip: {
-                    valueSuffix: '%'
-                }
-            }]
+            series: <?php echo json_encode($chart['infants_positivity']['infant_pos'])?>
         });
     });
     
@@ -247,23 +221,8 @@ $(function () {
                 floating: true,
                 backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
             },
-            series: [{
-                name: 'Children Positive',
-                type: 'column',
-                yAxis: 1,
-                data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4],
-                tooltip: {
-                    valueSuffix: 'v'
-                }
-    
-            }, {
-                name: 'Children Positivity',
-                type: 'spline',
-                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6],
-                tooltip: {
-                    valueSuffix: '%'
-                }
-            }]
+            series: <?php echo json_encode($chart['children_positivity']['child_pos'])?>
+
         });
     });
     
@@ -320,23 +279,7 @@ $(function () {
                 floating: true,
                 backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
             },
-            series: [{
-                name: 'Adults Positive',
-                type: 'column',
-                yAxis: 1,
-                data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4],
-                tooltip: {
-                    valueSuffix: 'v'
-                }
-    
-            }, {
-                name: 'Adults Positivity',
-                type: 'spline',
-                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6],
-                tooltip: {
-                    valueSuffix: '%'
-                }
-            }]
+            series: <?php echo json_encode($chart['adults_positivity']['adult_pos'])?>
         });
     });
     
@@ -374,13 +317,7 @@ $(function () {
                 verticalAlign: 'middle',
                 borderWidth: 0
             },
-            series: [{
-                name: 'Children HIV +ve',
-                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
-            }, {
-                name: 'Children Enrolled in Care',
-                data: [0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
-            }]
+            series: <?php echo json_encode($chart['children_positive_enrolled']['child_posen'])?>
         });
     });
 
@@ -417,13 +354,7 @@ $(function () {
                 verticalAlign: 'middle',
                 borderWidth: 0
             },
-            series: [{
-                name: 'HIV +ve Adults',
-                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
-            }, {
-                name: 'Adults Enrolled in Care',
-                data: [0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
-            }]
+            series: <?php echo json_encode($chart['adults_positive_enrolled']['adult_posen'])?>
         });
     });
 
@@ -460,13 +391,7 @@ $(function () {
                 verticalAlign: 'middle',
                 borderWidth: 0
             },
-            series: [{
-                name: 'Total HIV +ve',
-                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
-            }, {
-                name: 'Total Enrolled in Care',
-                data: [0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
-            }]
+            series: <?php echo json_encode($chart['total_positive_enrolled']['total_posen'])?>
         });
     });
 
@@ -503,13 +428,7 @@ $(function () {
                 verticalAlign: 'middle',
                 borderWidth: 0
             },
-            series: [{
-                name: '1st 90 Target Line',
-                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
-            }, {
-                name: 'Children Currently in Care',
-                data: [0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
-            }]
+            series: <?php echo json_encode($chart['estimated_identified_children']['child_care'])?>
         });
     });
 
@@ -546,13 +465,7 @@ $(function () {
                 verticalAlign: 'middle',
                 borderWidth: 0
             },
-            series: [{
-                name: '1st 90 Target Line',
-                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
-            }, {
-                name: 'Adults Currently in Care',
-                data: [0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6, 2.5]
-            }]
+            series: <?php echo json_encode($chart['estimated_identified_adults']['adult_care'])?>
         });
     });
 
