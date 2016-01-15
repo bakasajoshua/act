@@ -16,13 +16,14 @@ class dashboard extends MY_Controller
 	{
 		$this->set_session_data();
 		$data = array();
-		$id=array('county_ID' => 0);
-		$filter = $this->filter(NULL);
+		$filter = $this->filter(Date('Y'));
 		
 		//Data array to be displayed
 		$data['counties'] = $this->select_county();
-		$data['chart']= $this->charts->first_dashboard($id);
-		$data['breadcrumb'] = $this->breadcrumb($id);
+		$data['first_ninety']= $this->charts->first_dashboard();
+		$data['second_ninety'] = $this->charts->second_dashboard();
+		$data['third_ninety'] = $this->charts->third_dashboard();
+		$data['breadcrumb'] = $this->breadcrumb();
 
 		// echo "<pre>";print_r($data);die();
 		$this->template->dashboard($data);
@@ -30,15 +31,19 @@ class dashboard extends MY_Controller
 
 	function county($year=NULL)
 	{
+
 		if ($year==NULL)
 			$filter = $this->filter($this->session->userdata('year'));
 		else
 			$filter = $this->filter($year);
+		// echo $this->session->userdata('year');die();
 		
 		//Data array to be displayed
 		$data['breadcrumb'] = $this->breadcrumb();
 		$data['counties'] = $this->select_county();
-		$data['chart'] = $this->charts->first_dashboard();
+		$data['first_ninety'] = $this->charts->first_dashboard();
+		$data['second_ninety'] = $this->charts->second_dashboard();
+		$data['third_ninety'] = $this->charts->third_dashboard();
 		// echo "<pre>";print_r($data);die();
 		$this->template->dashboard($data);
 	}

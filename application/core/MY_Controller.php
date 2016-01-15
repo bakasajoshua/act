@@ -69,10 +69,7 @@ class MY_Controller extends MX_Controller{
 
     public function filter($year)
     {
-        if($year==NULL)
-            $this->session->userdata('year', Date('Y'));
-        else
-            $this->session->set_userdata('year', $year);
+        $this->session->set_userdata('year', $year);
 
         //Setting the relevant selected county
         if ($this->input->post('county_name'))

@@ -465,7 +465,7 @@
 			$id = $this->session->userdata('county_ID');
 			$year = $this->session->userdata('year');
 			
-			//Getting the number of children positive for the selected county
+			//Getting the children target
 			$targets = $this->get_target_lines($year);
 			
 			$sql = "SELECT
@@ -531,6 +531,42 @@
 				}
 			}
 			return $data;
+		}
+
+		function estimate_total_identification()
+		{
+			$id = $this->session->userdata('county_ID');
+			$year = $this->session->userdata('year');
+			
+			//Getting the number of children positive for the selected county
+			$targets = $this->get_target_lines($year);
+			
+			$sql = "SELECT
+						`total_starting`,
+						MONTH(`period`) AS `month`,
+						YEAR(`period`) AS `year`
+					FROM `dhis_calc_art`
+					WHERE YEAR(`period`) = '$year' AND `county_ID` = '$id'";
+			$inneed = $this->db->query($sql)->result_array();
+
+			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
+
+			//Building the chart data
+			$data["total_care"][0]["name"] = 'target line';
+			$data["total_care"][1]["name"] = 'currently in care';
+
+			$count=0;
+			$target = (($targets['children']+$targets['adults'])/12);
+			foreach ($months as $key => $value) {
+				$data["total_care"][0]["data"][$key]	=  (int) $target;
+				$data["total_care"][1]["data"][$key]	=  $count;
+				foreach ($inneed as $key1 => $value1) {
+					if( (int)$value == (int) $value1["month"]){
+						$data["total_care"][1]["data"][$key]	=  (int) $value1["total_starting"];
+					}
+				}
+			}
+			return $data;	
 		}
 
 		
