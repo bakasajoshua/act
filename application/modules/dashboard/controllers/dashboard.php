@@ -16,7 +16,8 @@ class dashboard extends MY_Controller
 	{
 		$this->set_session_data();
 		$data = array();
-		$filter = $this->filter(Date('Y'));
+		$year = (Date('Y')-1);
+		$filter = $this->filter($year);
 		
 		//Data array to be displayed
 		$data['counties'] = $this->select_county();

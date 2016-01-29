@@ -17,34 +17,47 @@ class second_dashboard extends MY_Model
 		$year = $this->session->userdata('year');
 
 		$sql = "SELECT
-						SUM(`cumulative_positive`) AS `cumulative_infants_positive`,
-						SUM(`cumulative_onTx`) AS `cumulative_infants_starting`,
-						MONTH(`period`) AS `month`,
-						YEAR(`period`) AS `year`
-					FROM `eid_calc`
-					WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'
-					GROUP BY `period`";
-			$eid_pos_art = $this->db->query($sql)->result_array();
+					`cum_eid` AS `cumulative_infants_positive`,
+					MONTH(`period`) AS `month`,
+					YEAR(`period`) AS `year`
+				FROM `dhis_calc_positive`
+				WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'
+				GROUP BY `period`";
+		$eid_pos = $this->db->query($sql)->result_array();
 
-			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
+		$sql = "SELECT
+					`cum_started_infants` AS `cumulative_infants_starting`,
+					MONTH(`period`) AS `month`,
+					YEAR(`period`) AS `year`
+				FROM `dhis_calc_art`
+				WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'
+				GROUP BY `period`";
+		$eid_art = $this->db->query($sql)->result_array();
 
-			$data["infant_posart"][0]["name"] = 'HIV +ve';
-			$data["infant_posart"][1]["name"] = 'started on ART';
+		$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
 
-			$count=0;
+		$data["infant_posart"][0]["name"] = 'HIV +ve';
+		$data["infant_posart"][1]["name"] = 'started on ART';
 
-			foreach ($months as $key => $value) {
-				$data["infant_posart"][0]["data"][$key]	=  $count;
-				$data["infant_posart"][1]["data"][$key]	=  $count;
-				foreach ($eid_pos_art as $key1 => $value1) {
-					if( (int)$value == (int) $value1["month"]){
-						$data["infant_posart"][0]["data"][$key]	=  (int) $value1["cumulative_infants_positive"];
-						$data["infant_posart"][1]["data"][$key]	=  (int) $value1["cumulative_infants_starting"];
-					}
+		$count=0;
+
+		foreach ($months as $key => $value) {
+			$data["infant_posart"][0]["data"][$key]	=  $count;
+			$data["infant_posart"][1]["data"][$key]	=  $count;
+			foreach ($eid_pos as $key1 => $value1) {
+				if( (int)$value == (int) $value1["month"]){
+					$data["infant_posart"][0]["data"][$key]	=  (int) $value1["cumulative_infants_positive"];
 				}
 			}
-			
-			return $data;
+
+			foreach ($eid_art as $key1 => $value1) {
+				if( (int)$value == (int) $value1["month"]){
+					$data["infant_posart"][1]["data"][$key]	=  (int) $value1["cumulative_infants_starting"];
+				}
+			}
+		}
+		
+		return $data;
 	}
 
 	function cumulative_children_started_art()
@@ -53,7 +66,7 @@ class second_dashboard extends MY_Model
 		$year = $this->session->userdata('year');
 		
 		$sql = "SELECT 
-					`cum_children` AS `cumulative_art_children`,
+					`cum_started_children` AS `cumulative_art_children`,
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `dhis_calc_art`
@@ -61,7 +74,7 @@ class second_dashboard extends MY_Model
 		$art = $this->db->query($sql)->result_array();
 
 		$sql = "SELECT 
-					`cum_children` AS `cumulative_enroll_children`,
+					`cum_enrl_care_peds` AS `cumulative_enroll_children`,
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `dhis_calc_enrollment`
@@ -100,7 +113,7 @@ class second_dashboard extends MY_Model
 		$year = $this->session->userdata('year');
 		
 		$sql = "SELECT 
-					`cum_adults` AS `cumulative_art_adults`,
+					`cum_started_adults` AS `cumulative_art_adults`,
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `dhis_calc_art`
@@ -108,7 +121,7 @@ class second_dashboard extends MY_Model
 		$art = $this->db->query($sql)->result_array();
 
 		$sql = "SELECT 
-					`cum_adults` AS `cumulative_enroll_adults`,
+					`cum_enrl_care_adults` AS `cumulative_enroll_adults`,
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `dhis_calc_enrollment`
@@ -174,7 +187,7 @@ class second_dashboard extends MY_Model
 		$targets = $this->get_target_lines($year);
 		
 		$sql = "SELECT
-					`total_children_starting`,
+					`curr_art_peds`,
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `dhis_calc_art`
@@ -182,7 +195,7 @@ class second_dashboard extends MY_Model
 		$inart = $this->db->query($sql)->result_array();
 
 		$sql = "SELECT
-					`total_children`,
+					`curr_care_peds`,
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `dhis_calc_enrollment`
@@ -204,13 +217,13 @@ class second_dashboard extends MY_Model
 			$data["child_need"][2]["data"][$key]	=  $count;
 			foreach ($inart as $key1 => $value1) {
 				if( (int)$value == (int) $value1["month"]){
-					$data["child_need"][1]["data"][$key]	=  (int) $value1["total_children_starting"];
+					$data["child_need"][1]["data"][$key]	=  (int) $value1["curr_art_peds"];
 				}
 			}
 
 			foreach ($incare as $key1 => $value1) {
 				if( (int)$value == (int) $value1["month"]){
-					$data["child_need"][2]["data"][$key]	=  (int) $value1["total_children"];
+					$data["child_need"][2]["data"][$key]	=  (int) $value1["curr_care_peds"];
 				}
 			}
 		}
@@ -226,7 +239,7 @@ class second_dashboard extends MY_Model
 		$targets = $this->get_target_lines($year);
 		
 		$sql = "SELECT
-					`total_adults_starting`,
+					`curr_art_adults`,
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `dhis_calc_art`
@@ -234,7 +247,7 @@ class second_dashboard extends MY_Model
 		$inart = $this->db->query($sql)->result_array();
 
 		$sql = "SELECT
-					`total_adults`,
+					`curr_care_adults`,
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `dhis_calc_enrollment`
@@ -256,13 +269,13 @@ class second_dashboard extends MY_Model
 			$data["adult_need"][2]["data"][$key]	=  $count;
 			foreach ($inart as $key1 => $value1) {
 				if( (int)$value == (int) $value1["month"]){
-					$data["adult_need"][1]["data"][$key]	=  (int) $value1["total_adults_starting"];
+					$data["adult_need"][1]["data"][$key]	=  (int) $value1["curr_art_adults"];
 				}
 			}
 
 			foreach ($incare as $key1 => $value1) {
 				if( (int)$value == (int) $value1["month"]){
-					$data["adult_need"][2]["data"][$key]	=  (int) $value1["total_adults"];
+					$data["adult_need"][2]["data"][$key]	=  (int) $value1["curr_care_adults"];
 				}
 			}
 		}
@@ -278,7 +291,7 @@ class second_dashboard extends MY_Model
 		$targets = $this->get_target_lines($year);
 		
 		$sql = "SELECT
-					`total_starting`,
+					`curr_art_total`,
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `dhis_calc_art`
@@ -286,7 +299,7 @@ class second_dashboard extends MY_Model
 		$inart = $this->db->query($sql)->result_array();
 
 		$sql = "SELECT
-					`total`,
+					`curr_care_total`,
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `dhis_calc_enrollment`
@@ -308,13 +321,13 @@ class second_dashboard extends MY_Model
 			$data["total_need"][2]["data"][$key]	=  $count;
 			foreach ($inart as $key1 => $value1) {
 				if( (int)$value == (int) $value1["month"]){
-					$data["total_need"][1]["data"][$key]	=  (int) $value1["total_starting"];
+					$data["total_need"][1]["data"][$key]	=  (int) $value1["curr_art_total"];
 				}
 			}
 
 			foreach ($incare as $key1 => $value1) {
 				if( (int)$value == (int) $value1["month"]){
-					$data["total_need"][2]["data"][$key]	=  (int) $value1["total"];
+					$data["total_need"][2]["data"][$key]	=  (int) $value1["curr_care_total"];
 				}
 			}
 		}

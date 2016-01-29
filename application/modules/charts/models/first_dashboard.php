@@ -16,14 +16,22 @@
 			$year = $this->session->userdata('year');
 
 			$sql = "SELECT
-						SUM(`cumulative_test`) AS `cumulative_infants_test`,
-						SUM(`cumulative_positive`) AS `cumulative_infants_positive`,
+						`eid` AS `cumulative_infants_test`,
 						MONTH(`period`) AS `month`,
 						YEAR(`period`) AS `year`
-					FROM `eid_calc`
+					FROM `dhis_calc_tests`
 					WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'
 					GROUP BY `period`";
-			$eid_test_pos = $this->db->query($sql)->result_array();
+			$eid_test = $this->db->query($sql)->result_array();
+			
+			$sql = "SELECT
+						`eid` AS `cumulative_infants_positive`,
+						MONTH(`period`) AS `month`,
+						YEAR(`period`) AS `year`
+					FROM `dhis_calc_positive`
+					WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'
+					GROUP BY `period`";
+			$eid_pos = $this->db->query($sql)->result_array();
 
 			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
 
@@ -35,9 +43,13 @@
 			foreach ($months as $key => $value) {
 				$data["infant_tspos"][0]["data"][$key]	=  $count;
 				$data["infant_tspos"][1]["data"][$key]	=  $count;
-				foreach ($eid_test_pos as $key1 => $value1) {
+				foreach ($eid_test as $key1 => $value1) {
 					if( (int)$value == (int) $value1["month"]){
 						$data["infant_tspos"][0]["data"][$key]	=  (int) $value1["cumulative_infants_test"];
+					}
+				}
+				foreach ($eid_pos as $key1 => $value1) {
+					if( (int)$value == (int) $value1["month"]){
 						$data["infant_tspos"][1]["data"][$key]	=  (int) $value1["cumulative_infants_positive"];
 					}
 				}
@@ -157,10 +169,10 @@
 			$year = $this->session->userdata('year');
 
 			$sql = "SELECT
-						SUM(`positive`) AS `infants_positive`,
+						`eid` AS `infants_positive`,
 						MONTH(`period`) AS `month`,
 						YEAR(`period`) AS `year`
-					FROM `eid`
+					FROM `dhis_calc_positive`
 					WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'
 					GROUP BY `period`";
 			$positive = $this->db->query($sql)->result_array();
@@ -313,7 +325,7 @@
 			$sql = "SELECT
 						MONTH(`de`.`period`) AS `month`,
 						YEAR(`de`.`period`) AS `year`,
-						`de`.`cum_children` AS `cumulative_enrolled_children`
+						`de`.`cum_enrl_care_peds` AS `cumulative_enrolled_children`
 					FROM `dhis_calc_enrollment` `de`
 					WHERE `de`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
 			$enrolled = $this->db->query($sql)->result_array();
@@ -360,7 +372,7 @@
 			$sql = "SELECT
 						MONTH(`de`.`period`) AS `month`,
 						YEAR(`de`.`period`) AS `year`,
-						`de`.`cum_adults` AS `cumulative_enrolled_adults`
+						`de`.`cum_enrl_care_adults` AS `cumulative_enrolled_adults`
 					FROM `dhis_calc_enrollment` `de`
 					WHERE `de`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
 			$enrolled = $this->db->query($sql)->result_array();
@@ -407,7 +419,7 @@
 			$sql = "SELECT
 						MONTH(`de`.`period`) AS `month`,
 						YEAR(`de`.`period`) AS `year`,
-						`de`.`cum_total` AS `cumulative_enrolled_total`
+						`de`.`cum_enrl_care_total` AS `cumulative_enrolled_total`
 					FROM `dhis_calc_enrollment` `de`
 					WHERE `de`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
 			$enrolled = $this->db->query($sql)->result_array();
@@ -469,7 +481,7 @@
 			$targets = $this->get_target_lines($year);
 			
 			$sql = "SELECT
-						`total_children_starting`,
+						`curr_art_peds`,
 						MONTH(`period`) AS `month`,
 						YEAR(`period`) AS `year`
 					FROM `dhis_calc_art`
@@ -489,7 +501,7 @@
 				$data["child_care"][1]["data"][$key]	=  $count;
 				foreach ($incare as $key1 => $value1) {
 					if( (int)$value == (int) $value1["month"]){
-						$data["child_care"][1]["data"][$key]	=  (int) $value1["total_children_starting"];
+						$data["child_care"][1]["data"][$key]	=  (int) $value1["curr_art_peds"];
 					}
 				}
 			}
@@ -506,7 +518,7 @@
 			$targets = $this->get_target_lines($year);
 			
 			$sql = "SELECT
-						`total_adults_starting`,
+						`curr_art_adults`,
 						MONTH(`period`) AS `month`,
 						YEAR(`period`) AS `year`
 					FROM `dhis_calc_art`
@@ -526,7 +538,7 @@
 				$data["adult_care"][1]["data"][$key]	=  $count;
 				foreach ($incare as $key1 => $value1) {
 					if( (int)$value == (int) $value1["month"]){
-						$data["adult_care"][1]["data"][$key]	=  (int) $value1["total_adults_starting"];
+						$data["adult_care"][1]["data"][$key]	=  (int) $value1["curr_art_adults"];
 					}
 				}
 			}
@@ -542,7 +554,7 @@
 			$targets = $this->get_target_lines($year);
 			
 			$sql = "SELECT
-						`total_starting`,
+						`curr_art_total`,
 						MONTH(`period`) AS `month`,
 						YEAR(`period`) AS `year`
 					FROM `dhis_calc_art`
@@ -562,7 +574,7 @@
 				$data["total_care"][1]["data"][$key]	=  $count;
 				foreach ($inneed as $key1 => $value1) {
 					if( (int)$value == (int) $value1["month"]){
-						$data["total_care"][1]["data"][$key]	=  (int) $value1["total_starting"];
+						$data["total_care"][1]["data"][$key]	=  (int) $value1["curr_art_total"];
 					}
 				}
 			}

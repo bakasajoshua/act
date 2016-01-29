@@ -57,6 +57,7 @@ class api extends MX_Controller
 
 	function format_data($data)
 	{
+
 		$counter=0;
 		$cols = array();
 		//Data formatting to match the db cols and rows
@@ -79,7 +80,7 @@ class api extends MX_Controller
 			}
 			
 		}
-		// echo "<pre>";print_r($new);die();
+		
 		//Getting back the aggregated values from the raw data
 		$insert_data = $this->sub_formating_data($new);
 		$insert = $this->api_model->dhis_insert_aggregation($insert_data);
@@ -87,23 +88,20 @@ class api extends MX_Controller
 
 	function sub_formating_data($data)
 	{
-		$counties = $this->api_model->counties();
+		
+		foreach ($data as $k => $v) {
+			//Assigning the county_ID to the corresponding county_name
+			$county = $this->format_county_name($v['county']);
+			$counties = $this->api_model->counties($county);
+			$data[$k]['county'] = $counties[0]['county_ID'];
+			
+			//Formatting the period of the data to php
+			$dates = date_parse($v['periods']);
+			$data_date = $dates['day'].'-'.$dates['month'].'-'.$dates['day'];
+			$data[$k]['periods'] = $data_date;
 
-		foreach ($counties as $key => $value) {
-			foreach ($data as $k => $v) {
-				//Assigning the county_ID to the corresponding county_name
-				$county = $this->format_county_name($v['organisationunitname']);
-				if ($county == $value['county_name']) {
-					$data[$k]['organisationunitname'] = $value['county_ID'];
-				}
-				//Formatting the period of the data to php
-				$dates = date_parse($v['periodname']);
-				$test_date = Date('Y').'-'.$dates['month'].'-'.$dates['day'];
-				$data[$k]['periodname'] = $test_date;
-
-			}
 		}
-
+		
 		//Organizing the data to and calculating the required aggregates:
 		//		Tests
 		//		Positive
@@ -113,230 +111,277 @@ class api extends MX_Controller
 		$newdata['positive'] = $this->calculate_dhis_positive($data);
 		$newdata['enrollment'] = $this->calculate_dhis_enrollment($data);
 		$newdata['art'] = $this->calculate_dhis_art($data);
+		// echo "<pre>";print_r($newdata['art']);die();
 
 		return $newdata;
 	}
 
 	function calculate_dhis_tests($data){
-			$cumulative_children=0;
-			$cumulative_adults=0;
-			$next = 0;
+		$cumulative_eid=0;
+		$cumulative_children=0;
+		$cumulative_adults=0;
+		$cumulative_total=0;
+		$next = NULL;
         foreach ($data as $key => $value) {
-        	if ($next == 0) {//Checking if it is the first Iteration and setting the next value the same as the county name
-        		$next = $value['organisationunitname'];
+        	if ($next == NULL) {//Checking if it is the first Iteration and setting the next value the same as the county name
+        		$next = $value['county'];
         	} else {
-        		if($next != $value['organisationunitname'])//Checking if the next value is equivalent to the current county in process then reset the cummulatives if different
+        		if($next != $value['county'])//Checking if the next value is equivalent to the current county in process then reset the cummulatives if different
         		{
-        			echo $next;
+        			$cumulative_eid=0;
         			$cumulative_children=0;
 					$cumulative_adults=0;
+					$cumulative_total=0;
+					$next = $value['county'];
         		}
         	}
         	
-        	$test_sum[0] = ($value['vctclientstested(15-24yrs,female)']+$value['vctclientstested(female,_gt25yrs)']+$value['vctclientstested(15-24yrs,male)']+$value['vctclientstested(male,_gt25yrs)']+$value['dtcinpatienttested(male,adult_gt14yrs)']+$value['dtcoutpatienttested(male,adult_gt14yrs)']+$value['dtcoutpatienttested(female,adult_gt14yrs)']);
-			$test_sum[1] = ($value['dtcinpatienttested(female,adult_gt14yrs)']+$value['anchivtests']+$value['labouranddelivery']+$value['postnatal(within72']);
-			$dhis_tests[0] = array(
-			  		'county_ID' => $value['organisationunitname'],
-			  		'sub_county_ID' => $value['organisationunitname'],
-			  		'facility_ID' => $value['organisationunitname'],
-			  		'period' => $value['periodname'],
-			  		'vct_female_15_24' => $value['vctclientstested(15-24yrs,female)'],
-			  		'vct_female_25' => $value['vctclientstested(female,_gt25yrs)'],
-			  		'vct_male_15_24' => $value['vctclientstested(15-24yrs,male)'],
-			  		'vct_male_25' => $value['vctclientstested(male,_gt25yrs)'],
-			  		'dtc_inmale_gt14' => $value['dtcinpatienttested(male,adult_gt14yrs)'],
-			  		'dtc_outmale_gt14' => $value['dtcoutpatienttested(male,adult_gt14yrs)'],
-			  		'dtc_infemale_gt14' => $value['dtcoutpatienttested(female,adult_gt14yrs)'],
-			  		'dtc_outfemale_gt14' => $value['dtcinpatienttested(female,adult_gt14yrs)'],
-			  		'anc_hiv_tests' => $value['anchivtests'],
-			  		'labour_delivery' => $value['labouranddelivery'],
-			  		'postnatal' => $value['postnatal(within72'],
-			  		'dtc_infemale_lt14' => $value['dtcinpatienttested(female,children_lt14yrs)'],
-			  		'dtc_outfemale_lt14' => $value['dtcoutpatienttested(female,children_lt14yrs)'],
-			  		'dtc_inmale_lt14' => $value['dtcoutpatienttested(male,children_lt14yrs)'],
-			  		'dtc_outmale_lt14' => $value['dtcinpatienttested(male,children_lt14yrs)']
-				);
-			$total_children = ($value['dtcinpatienttested(female,children_lt14yrs)']+$value['dtcoutpatienttested(female,children_lt14yrs)']+$value['dtcoutpatienttested(male,children_lt14yrs)']+$value['dtcinpatienttested(male,children_lt14yrs)']);
-			$total_adults = ($test_sum[0]+$test_sum[1]);
+   			// $test_sum[0] = ($value['vctclientstested(15-24yrs,female)']+$value['vctclientstested(female,_gt25yrs)']+$value['vctclientstested(15-24yrs,male)']+$value['vctclientstested(male,_gt25yrs)']+$value['dtcinpatienttested(male,adult_gt14yrs)']+$value['dtcoutpatienttested(male,adult_gt14yrs)']+$value['dtcoutpatienttested(female,adult_gt14yrs)']);
+			// $test_sum[1] = ($value['dtcinpatienttested(female,adult_gt14yrs)']+$value['anchivtests']+$value['labouranddelivery']+$value['postnatal(within72']);
+			// $dhis_tests[0] = array(
+			//   		'county_ID' => $value['county'],
+			//   		'sub_county_ID' => $value['county'],
+			//   		'facility_ID' => $value['county'],
+			//   		'period' => $value['periods'],
+			//   		'vct_female_15_24' => $value['vctclientstested(15-24yrs,female)'],
+			//   		'vct_female_25' => $value['vctclientstested(female,_gt25yrs)'],
+			//   		'vct_male_15_24' => $value['vctclientstested(15-24yrs,male)'],
+			//   		'vct_male_25' => $value['vctclientstested(male,_gt25yrs)'],
+			//   		'dtc_inmale_gt14' => $value['dtcinpatienttested(male,adult_gt14yrs)'],
+			//   		'dtc_outmale_gt14' => $value['dtcoutpatienttested(male,adult_gt14yrs)'],
+			//   		'dtc_infemale_gt14' => $value['dtcoutpatienttested(female,adult_gt14yrs)'],
+			//   		'dtc_outfemale_gt14' => $value['dtcinpatienttested(female,adult_gt14yrs)'],
+			//   		'anc_hiv_tests' => $value['anchivtests'],
+			//   		'labour_delivery' => $value['labouranddelivery'],
+			//   		'postnatal' => $value['postnatal(within72'],
+			//   		'dtc_infemale_lt14' => $value['dtcinpatienttested(female,children_lt14yrs)'],
+			//   		'dtc_outfemale_lt14' => $value['dtcoutpatienttested(female,children_lt14yrs)'],
+			//   		'dtc_inmale_lt14' => $value['dtcoutpatienttested(male,children_lt14yrs)'],
+			//   		'dtc_outmale_lt14' => $value['dtcinpatienttested(male,children_lt14yrs)']
+			// 	);
+			$total_eid = $value['eid_tests'];
+			$total_children = $value['tested_peds'];
+			$total_adults = $value['tested_adult'];
+			$total = $value['tested_total'];
+			$cumulative_eid = $cumulative_eid+$total_eid;
 			$cumulative_children = $cumulative_children+$total_children;
 			$cumulative_adults = $cumulative_adults+$total_adults;
-			$dhis_tests[1] = array(
-				  		'county_ID' => $value['organisationunitname'],
-						'sub_county_ID' => $value['organisationunitname'],
-						'facility_ID' => $value['organisationunitname'],
-						'period' => $value['periodname'],
+			$cumulative_total = $cumulative_total+$total;
+			$dhis_tests[$key] = array(
+				  		'county_ID' => $value['county'],
+						'sub_county_ID' => $value['county'],
+						'facility_ID' => $value['county'],
+						'period' => $value['periods'],
+						'eid' => $total_eid,
 						'total_children' => $total_children,
-						'total_adults' => ($test_sum[0]+$test_sum[1]),
+						'total_adults' => $total_adults,
+						'total' => $total,
+						'cum_eid' => $cumulative_eid,
 						'cum_children' => $cumulative_children,
 						'cum_adults' => $cumulative_adults,
+						'cum_total' => $cumulative_total
 					);
-			$tests[] = $dhis_tests;
+			
         }
-        // echo "<pre>";print_r($tests);die();
-		 return $tests;
+        
+		return $dhis_tests;
 
 	}
 
 	function calculate_dhis_positive($data){
+		$cum_eid=0;
 		$cum_children=0;
 		$cum_adults=0;
 		$cum_total=0;
-		$next = 0;
-
+		$next = NULL;
+		
 		foreach ($data as $key => $value) {
-			if ($next = '') {//Checking if it is the first Iteration and setting the next value the same as the county name
-        		$next = $value['organisationunitname'];
+			if ($next == NULL) {//Checking if it is the first Iteration and setting the next value the same as the county name
+        		$next = $value['county'];
         	} else {
-        		if($next != $value['organisationunitname'])//Checking if the next value is equivalent to the current county in process then reset the cummulatives if different
+        		if($next != $value['county'])//Checking if the next value is equivalent to the current county in process then reset the cummulatives if different
         		{
+        			$cum_eid=0;
         			$cum_children=0;
 					$cum_adults=0;
 					$cum_total=0;
+					$next = $value['county'];
         		}
         	}
-			$dhis_positive[0] =  array(
-				  		'county_ID' => $value['organisationunitname'],
-				  		'sub_county_ID' => $value['organisationunitname'],
-				  		'facility_ID' => $value['organisationunitname'],
-				  		'period' => $value['periodname'],
-						'vct_female_15_24' => $value['vctclientshiv+ve(15-24yrs,female)'],
-						'vct_female_25' => $value['vctclientshiv+ve(female,_gt25yrs)'],
-						'vct_male_15_24' => $value['vctclientshiv+ve(15-24yrs,male)'],
-						'vct_male_25' => $value['vctclientshiv+ve(male,_gt25yrs)'],
-						'dtc_inmale_gt14' => $value['dtc-inpatienthiv+ve(male,adult_gt14yrs)'],
-						'dtc_outmale_gt14' => $value['dtc-outpatienthiv+ve(male,adult_gt14yrs)'],
-						'dtc_infemiale_gt14' => $value['dtc-inpatienthiv+ve(female,adult_gt14yrs)'],
-						'dtc_outfemale_gt14' => $value['dtc-outpatienthiv+ve(female,adult_gt14yrs)'],
-						'anc_hiv_tests' => $value['antenatalpositive'],
-						'labour_delivery' => $value['labouranddeliverypositive'],
-						'postnatal' => $value['postnatalhiv+'],
-						'dtc_infemale_lt14' => $value['dtc-inpatienthiv+ve(female,children_lt14yrs)'],
-						'dtc_outfemale_lt14' => $value['dtc-outpatienthiv+ve(female,children_lt14yrs)'],
-						'dtc_inmale_lt14' => $value['dtc-inpatienthiv+ve(male,children_lt14yrs)'],
-						'dtc_outmale_lt14' => $value['dtc-outpatienthiv+ve(male,children_lt14yrs)'],
-					  	'known_positive_status' => $value['knownpositivestatus']
-					);
-
-			$total_children = ($value['dtc-outpatienthiv+ve(male,children_lt14yrs)']+$value['dtc-inpatienthiv+ve(female,children_lt14yrs)']+$value['dtc-inpatienthiv+ve(male,children_lt14yrs)']+$value['dtc-outpatienthiv+ve(female,children_lt14yrs)']);
-			$total_adults = ($value['vctclientshiv+ve(15-24yrs,female)']+$value['vctclientshiv+ve(female,_gt25yrs)']+$value['vctclientshiv+ve(15-24yrs,male)']+$value['vctclientshiv+ve(male,_gt25yrs)']+$value['dtc-inpatienthiv+ve(male,adult_gt14yrs)']+$value['dtc-outpatienthiv+ve(male,adult_gt14yrs)']+$value['dtc-inpatienthiv+ve(female,adult_gt14yrs)']+$value['dtc-outpatienthiv+ve(female,adult_gt14yrs)']+$value['antenatalpositive']+$value['labouranddeliverypositive']+$value['postnatalhiv+']);
-			$total = ($total_children+$total_adults);
+			// $dhis_positive[0] =  array(
+			// 	  		'county_ID' => $value['county'],
+			// 	  		'sub_county_ID' => $value['county'],
+			// 	  		'facility_ID' => $value['county'],
+			// 	  		'period' => $value['periods'],
+			// 			'vct_female_15_24' => $value['vctclientshiv+ve(15-24yrs,female)'],
+			// 			'vct_female_25' => $value['vctclientshiv+ve(female,_gt25yrs)'],
+			// 			'vct_male_15_24' => $value['vctclientshiv+ve(15-24yrs,male)'],
+			// 			'vct_male_25' => $value['vctclientshiv+ve(male,_gt25yrs)'],
+			// 			'dtc_inmale_gt14' => $value['dtc-inpatienthiv+ve(male,adult_gt14yrs)'],
+			// 			'dtc_outmale_gt14' => $value['dtc-outpatienthiv+ve(male,adult_gt14yrs)'],
+			// 			'dtc_infemiale_gt14' => $value['dtc-inpatienthiv+ve(female,adult_gt14yrs)'],
+			// 			'dtc_outfemale_gt14' => $value['dtc-outpatienthiv+ve(female,adult_gt14yrs)'],
+			// 			'anc_hiv_tests' => $value['antenatalpositive'],
+			// 			'labour_delivery' => $value['labouranddeliverypositive'],
+			// 			'postnatal' => $value['postnatalhiv+'],
+			// 			'dtc_infemale_lt14' => $value['dtc-inpatienthiv+ve(female,children_lt14yrs)'],
+			// 			'dtc_outfemale_lt14' => $value['dtc-outpatienthiv+ve(female,children_lt14yrs)'],
+			// 			'dtc_inmale_lt14' => $value['dtc-inpatienthiv+ve(male,children_lt14yrs)'],
+			// 			'dtc_outmale_lt14' => $value['dtc-outpatienthiv+ve(male,children_lt14yrs)'],
+			// 		  	'known_positive_status' => $value['knownpositivestatus']
+			// 		);
+        	$total_eid = $value['eid_pos'];
+			$total_children = $value['pos_peds'];
+			$total_adults = $value['pos_adult'];
+			$total = $value['pos_total'];
+			$cum_eid = $cum_eid+$total_eid;
 			$cum_children= ($cum_children+$total_children);
 			$cum_adults = ($cum_adults+$total_adults);
 			$cum_total = ($cum_total+$total);
 
-			$dhis_positive[1] = array(
-				  		'county_ID' => $value['organisationunitname'],
-				  		'sub_county_ID' => $value['organisationunitname'],
-				  		'facility_ID' => $value['organisationunitname'],
-				  		'period' => $value['periodname'],
+			$dhis_positive[$key] = array(
+				  		'county_ID' => $value['county'],
+				  		'sub_county_ID' => $value['county'],
+				  		'facility_ID' => $value['county'],
+				  		'period' => $value['periods'],
+				  		'eid' => $total_eid,
 						'total_children' => $total_children,
 						'total_adults' => $total_adults,
 						'total' => $total,
+						'cum_eid' => $cum_eid,
 						'cum_children' => $cum_children,
 						'cum_adults' => $cum_adults,
 						'cum_total' => $cum_total,
-						'pregnant_mothers' => ($value['antenatalpositive']+$value['labouranddeliverypositive']+$value['postnatalhiv+']+$value['knownpositivestatus'])
+						'pregnant_mothers' => ($value['anc_pos']+$value['lab_dev_pos']+$value['pnc_pos']+$value['monthers_ks'])
 					);
-			$positive[] = $dhis_positive;
+			
 		}
 
-		return $positive;
+		return $dhis_positive;
 	}
 
 	function calculate_dhis_enrollment($data){
 		$cum_children=0;
 		$cum_adults=0;
 		$cum_total=0;
-		$next = 0;
-
+		$next = NULL;
+		
 		foreach ($data as $key => $value) {
-				if ($next = '') {//Checking if it is the first Iteration and setting the next value the same as the county name
-        		$next = $value['organisationunitname'];
+			if ($next == NULL) {//Checking if it is the first Iteration and setting the next value the same as the county name
+        		$next = $value['county'];
         	} else {
-        		if($next != $value['organisationunitname'])//Checking if the next value is equivalent to the current county in process then reset the cummulatives if different
+        		if($next != $value['county'])//Checking if the next value is equivalent to the current county in process then reset the cummulatives if different
         		{
         			$cum_children=0;
 					$cum_adults=0;
 					$cum_total=0;
+					$next = $value['county'];
         		}
         	}
-			$dhis_enrollment[0] = array(
-						'county_ID' => $value['organisationunitname'],
-				  		'sub_county_ID' => $value['organisationunitname'],
-				  		'facility_ID' => $value['organisationunitname'],
-				  		'period' => $value['periodname'],
-						'female_under_15' => $value['femaleunder15yrsenrolledincare'],
-						'male_under_15' => $value['maleunder15yrsenrolledincare'],
-						'female_above_15' => $value['femaleabove15yrsenrolled'],
-						'male_above_15' => $value['maleabove15yrsenrolled']
+			// $dhis_enrollment[0] = array(
+			// 			'county_ID' => $value['county'],
+			// 	  		'sub_county_ID' => $value['county'],
+			// 	  		'facility_ID' => $value['county'],
+			// 	  		'period' => $value['periods'],
+			// 			'female_under_15' => $value['femaleunder15yrsenrolledincare'],
+			// 			'male_under_15' => $value['maleunder15yrsenrolledincare'],
+			// 			'female_above_15' => $value['femaleabove15yrsenrolled'],
+			// 			'male_above_15' => $value['maleabove15yrsenrolled']
+			// 		);
+
+			$cum_children = ($cum_children+$value['enrl_care_peds']);
+			$cum_adults = ($cum_adults+$value['enrl_care_adult']);
+			$cum_total = ($cum_total+$value['enrl_care_total']);
+
+			$dhis_enrollment[$key] = array(
+						'county_ID' => $value['county'],
+				  		'sub_county_ID' => $value['county'],
+				  		'facility_ID' => $value['county'],
+				  		'period' => $value['periods'],
+				  		'enrl_care_lt_1yr' => $value['enrl_care_lt_1yr'],
+						'enrl_care_peds' => $value['enrl_care_peds'],
+						'enrl_care_adults' => $value['enrl_care_adult'],
+						'enrl_care_total' => $value['enrl_care_total'],
+						'curr_care_lt1yr' => $value['curr_care_lt1yr'],
+						'curr_care_peds' => $value['curr_care_peds'],
+						'curr_care_adults' => $value['curr_care_adult'],
+						'curr_care_total' => $value['curr_care_total'],
+						'cum_enrl_care_peds' => $cum_children,
+						'cum_enrl_care_adults' => $cum_adults,
+						'cum_enrl_care_total' => $cum_total
 					);
 
-			$total_children = ($value['femaleunder15yrsenrolledincare']+$value['maleunder15yrsenrolledincare']);
-			$total_adults = ($value['femaleabove15yrsenrolled']+$value['maleabove15yrsenrolled']);
-			$total = ($total_children+$total_adults);
-			$cum_children = ($cum_children+$total_children);
-			$cum_adults = ($cum_adults+$total_adults);
-			$cum_total = ($cum_total+$total);
-
-			$dhis_enrollment[1] = array(
-						'county_ID' => $value['organisationunitname'],
-				  		'sub_county_ID' => $value['organisationunitname'],
-				  		'facility_ID' => $value['organisationunitname'],
-				  		'period' => $value['periodname'],
-						'total_children' => $total_children,
-						'total_adults' => $total_adults,
-						'total' => $total,
-						'cum_children' => $cum_children,
-						'cum_adults' => $cum_adults,
-						'cum_total' => $cum_total
-					);
-
-			$enrollment[] = $dhis_enrollment;
 		}
-		return $enrollment;
+		return $dhis_enrollment;
 	}
 
 	function calculate_dhis_art($data){
+		
+		$cum_children=0;
+		$cum_adults=0;
+		$cum_infants=0;
+		$next = NULL;
+		
 		foreach ($data as $key => $value) {
+			if ($next == NULL) {//Checking if it is the first Iteration and setting the next value the same as the county name
+        		$next = $value['county'];
+        	} else {
+        		if($next != $value['county'])//Checking if the next value is equivalent to the current county in process then reset the cummulatives if different
+        		{
+        			$cum_children=0;
+					$cum_adults=0;
+					$cum_infants=0;
+					$next = $value['county'];
+        		}
+        	}
 
-			$dhis_enrollment[0] = array(
-						'county_ID' => $value['organisationunitname'],
-				  		'sub_county_ID' => $value['organisationunitname'],
-				  		'facility_ID' => $value['organisationunitname'],
-				  		'period' => $value['periodname'],
-					  	'female_under_15_starting' => $value['femaleunder15yrsstartingart'],
-					  	'male_under_15_starting' => $value['maleunder15yrsstartingart'],
-					  	'female_above_15_starting' => $value['femaleabove15yrstartingart'],
-					  	'male_above_15_starting' => $value['maleabove15yrsstartingart'],
-					  	'art_net_cohort' => $value['artnetcohortat12'],
-					  	'on_original' => $value['onoriginal1stline'],
-					  	'on_alternative_1' => $value['onalternative1stl'],
-					  	'on_alternative_2' => $value['on2ndline'],
-					  	'prophylaxisHAART' => $value['prophylaxis-haart']
-					);
+			// $dhis_enrollment[0] = array(
+			// 			'county_ID' => $value['county'],
+			// 	  		'sub_county_ID' => $value['county'],
+			// 	  		'facility_ID' => $value['county'],
+			// 	  		'period' => $value['periods'],
+			// 		  	'female_under_15_starting' => $value['femaleunder15yrsstartingart'],
+			// 		  	'male_under_15_starting' => $value['maleunder15yrsstartingart'],
+			// 		  	'female_above_15_starting' => $value['femaleabove15yrstartingart'],
+			// 		  	'male_above_15_starting' => $value['maleabove15yrsstartingart'],
+			// 		  	'art_net_cohort' => $value['artnetcohortat12'],
+			// 		  	'on_original' => $value['onoriginal1stline'],
+			// 		  	'on_alternative_1' => $value['onalternative1stl'],
+			// 		  	'on_alternative_2' => $value['on2ndline'],
+			// 		  	'prophylaxisHAART' => $value['prophylaxis-haart']
+			// 		);
 
-			$total_children = ($value['femaleunder15yrsstartingart']+$value['maleunder15yrsstartingart']);
-			$total_adults = ($value['femaleabove15yrstartingart']+$value['maleabove15yrsstartingart']);
-			$aliveART = ($value['onoriginal1stline']+$value['onalternative1stl']+$value['on2ndline']);
-			$retained = (($aliveART/$value['artnetcohortat12'])*100);
+			$cum_children = $cum_children+$value['start_art_peds'];
+           	$cum_adults = $cum_adults+$value['start_art_adult'];
+			$cum_infants = $cum_infants+$value['start_art_lt_1yr'];
+			$aliveART = $value['on_alt_1st_line']+$value['1st_line_snr_art']+$value['2nd_line_sor_art'];
+			// $retained = ($aliveART/$value['art_net_cht_snr_art'])*100;
 
-			$dhis_enrollment[1] = array(
-						'county_ID' => $value['organisationunitname'],
-				  		'sub_county_ID' => $value['organisationunitname'],
-				  		'facility_ID' => $value['organisationunitname'],
-				  		'period' => $value['periodname'],
-						'total_children_starting' => $total_children,
-						'total_adults_starting' => $total_adults,
-						'net_overall_cohort' => $value['artnetcohortat12'],
+			$dhis_enrollment[$key] = array(
+						'county_ID' => $value['county'],
+				  		'sub_county_ID' => $value['county'],
+				  		'facility_ID' => $value['county'],
+				  		'period' => $value['periods'],
+				  		'curr_art_lt_1yr' => $value['curr_art_lt_1yr'],
+				  		'curr_art_peds' => $value['curr_art_peds'],
+				  		'curr_art_adults' => $value['curr_art_adult'],
+				  		'curr_art_total' => $value['curr_art_total'],
+				  		'start_art_lt_1yr' => $value['start_art_lt_1yr'],
+						'start_art_peds' => $value['start_art_peds'],
+						'start_art_adults' => $value['start_art_adult'],
+						'start_art_total' => $value['start_art_total'],
+						'cum_started_infants' => $cum_infants,
+						'cum_started_children' => $cum_children,
+						'cum_started_adults' => $cum_adults,
+						'net_overall_cohort' => $value['art_net_cht_snr_art'],
 						'alive_on_art' => $aliveART,
-						'retained_on_art' => $retained,
-						'pregnantmothersonART' => $value['prophylaxis-haart']
+						'retained_on_art' => $value['art_net_cht_snr_art'],
+						'pregnantmothersonART' => $value['prophy_haart']
 					);
 
-			$art[] = $dhis_enrollment;
 		}
 
-		return $art;
+		return $dhis_enrollment;
 	}
 
 	public function format_county_name($name='')
@@ -345,14 +390,13 @@ class api extends MX_Controller
 		if ($name=='' || $name==' ') {
 			$new_name = NULL;
 		} else {
-			$county = explode('County', $name);
-			if(strpos($county[0], '-'))
+			if(strpos($name, '-'))
 			{
-				$exploded_county = explode("-", $county[0]);
+				$exploded_county = explode("-", $name);
 				$new_name = $exploded_county[0]." ".$exploded_county[1];
 			}
 			else{
-				$new_name = $county[0];
+				$new_name = $name;
 			}
 		}
 		

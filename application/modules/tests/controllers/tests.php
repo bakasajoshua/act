@@ -31,7 +31,7 @@ class tests extends MY_Controller
 				}
 			fclose($handle);
 			}
-
+			
 			if ($data_handler == 'dhis') 
 			{
 				$this->load->library('../controllers/api');

@@ -295,14 +295,14 @@
 			} else{
 				$('#sub-county').show();
 				$('#sub_county_select').children('#removable').remove();
-				$.get('<?php base_url();?>dashboard/ajax_get_sub_county/'+id, function(data){
+				/*$.get('<?php base_url();?>dashboard/ajax_get_sub_county/'+id, function(data){
 					obj=jQuery.parseJSON(data);
 					
-					$.each(obj, function(index, value){
+					jQuery.each(obj, function(index, value){
 						$('#sub_county_select').append('<option id="removable" value="'+value.sub_county_ID+'">'+value.sub_county_name+'</option>');
 						// console.log(value.sub_county_name);
 					});
-				});
+				});*/
 			}
 			
 		});
