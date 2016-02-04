@@ -231,15 +231,21 @@ class api extends MX_Controller
 			// 			'dtc_outmale_lt14' => $value['dtc-outpatienthiv+ve(male,children_lt14yrs)'],
 			// 		  	'known_positive_status' => $value['knownpositivestatus']
 			// 		);
+			//Positive Calculations
         	$total_eid = $value['eid_pos'];
 			$total_children = $value['pos_peds'];
 			$total_adults = $value['pos_adult'];
 			$total = $value['pos_total'];
+			$infants_positivity = (@($value['eid_pos']/$value['eid_tests'])*100);
+			$children_positivity = (@($value['pos_peds']/$value['tested_peds'])*100);
+			$adults_positivity = (@($value['pos_adult']/$value['tested_adult'])*100);
 			$cum_eid = $cum_eid+$total_eid;
 			$cum_children= ($cum_children+$total_children);
 			$cum_adults = ($cum_adults+$total_adults);
 			$cum_total = ($cum_total+$total);
+			$pregnant_mothers = ($value['anc_pos']+$value['lab_dev_pos']+$value['pnc_pos']+$value['monthers_ks']);
 
+			//Positive Data Structuring
 			$dhis_positive[$key] = array(
 				  		'county_ID' => $value['county'],
 				  		'sub_county_ID' => $value['county'],
@@ -249,11 +255,14 @@ class api extends MX_Controller
 						'total_children' => $total_children,
 						'total_adults' => $total_adults,
 						'total' => $total,
+						'infants_positivity' => $infants_positivity,
+						'children_positivity' => $children_positivity,
+						'adults_positivity' => $adults_positivity,
 						'cum_eid' => $cum_eid,
 						'cum_children' => $cum_children,
 						'cum_adults' => $cum_adults,
 						'cum_total' => $cum_total,
-						'pregnant_mothers' => ($value['anc_pos']+$value['lab_dev_pos']+$value['pnc_pos']+$value['monthers_ks'])
+						'pregnant_mothers' => $pregnant_mothers
 					);
 			
 		}

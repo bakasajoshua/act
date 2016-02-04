@@ -16,7 +16,7 @@
 			$year = $this->session->userdata('year');
 
 			$sql = "SELECT
-						`eid` AS `cumulative_infants_test`,
+						`cum_eid` AS `cumulative_infants_test`,
 						MONTH(`period`) AS `month`,
 						YEAR(`period`) AS `year`
 					FROM `dhis_calc_tests`
@@ -170,6 +170,7 @@
 
 			$sql = "SELECT
 						`eid` AS `infants_positive`,
+						`infants_positivity` AS `infants_positivity`,
 						MONTH(`period`) AS `month`,
 						YEAR(`period`) AS `year`
 					FROM `dhis_calc_positive`
@@ -203,7 +204,7 @@
 				//Generating the points for the positive line
 				foreach ($positive as $key1 => $value1) {
 					if( (int)$value == (int) $value1["month"]){
-						$data["infant_pos"][1]["data"][$key]	=  (int) $value1["infants_positive"];
+						$data["infant_pos"][1]["data"][$key]	=  (int) $value1["infants_positivity"];
 					}
 				}
 				$data["infant_pos"][1]["tooltip"] = array('valueSuffix' => '%' );
@@ -220,7 +221,8 @@
 			$sql = "SELECT
 						MONTH(`dp`.`period`) AS `month`,
 						YEAR(`dp`.`period`) AS `year`,
-						`dp`.`total_children` AS `total_positive_children`
+						`dp`.`total_children` AS `total_positive_children`,
+						`dp`.`children_positivity` AS `children_positivity`
 					FROM `dhis_calc_positive` `dp`
 					WHERE `dp`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
 			$positive = $this->db->query($sql)->result_array();
@@ -251,7 +253,7 @@
 				//Generating the points for the positive line
 				foreach ($positive as $key1 => $value1) {
 					if( (int)$value == (int) $value1["month"]){
-						$data["child_pos"][1]["data"][$key]	=  (int) $value1["total_positive_children"]/2;
+						$data["child_pos"][1]["data"][$key]	=  (int) $value1["children_positivity"];
 					}
 				}
 				$data["child_pos"][1]["tooltip"] = array('valueSuffix' => '%' );
@@ -268,7 +270,8 @@
 			$sql = "SELECT
 						MONTH(`dp`.`period`) AS `month`,
 						YEAR(`dp`.`period`) AS `year`,
-						`dp`.`total_adults` AS `total_positive_adults`
+						`dp`.`total_adults` AS `total_positive_adults`,
+						`dp`.`adults_positivity` AS `adults_positivity`
 					FROM `dhis_calc_positive` `dp`
 					WHERE `dp`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
 			$positive = $this->db->query($sql)->result_array();
@@ -299,7 +302,7 @@
 				//Generating the points for the positive line
 				foreach ($positive as $key1 => $value1) {
 					if( (int)$value == (int) $value1["month"]){
-						$data["adult_pos"][1]["data"][$key]	=  (int) $value1["total_positive_adults"]/2;
+						$data["adult_pos"][1]["data"][$key]	=  (int) $value1["adults_positivity"];
 					}
 				}
 				$data["adult_pos"][1]["tooltip"] = array('valueSuffix' => '%' );
