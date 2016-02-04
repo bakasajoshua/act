@@ -51,6 +51,8 @@
 			$this->load->model('third_dashboard');
 
 			$data['survival_retention_art'] = $this->third_dashboard->survival_retention_art();
+			$data['peds_vl_testing'] = $this->third_dashboard->peds_vl_testing();
+			$data['adults_vl_testing'] = $this->third_dashboard->adults_vl_testing();
 
 			return $data;
 		}

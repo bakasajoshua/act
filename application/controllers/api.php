@@ -111,6 +111,7 @@ class api extends MX_Controller
 		$newdata['positive'] = $this->calculate_dhis_positive($data);
 		$newdata['enrollment'] = $this->calculate_dhis_enrollment($data);
 		$newdata['art'] = $this->calculate_dhis_art($data);
+		$newdata['vl'] = $this->calculate_vl($data);
 		// echo "<pre>";print_r($newdata['art']);die();
 
 		return $newdata;
@@ -382,6 +383,28 @@ class api extends MX_Controller
 		}
 
 		return $dhis_enrollment;
+	}
+
+	function calculate_vl($data)
+	{
+		foreach ($data as $key => $value) {
+			$viral_load[$key] = array(
+						'county_ID' => $value['county'],
+				  		'sub_county_ID' => $value['county'],
+				  		'facility_ID' => $value['county'],
+				  		'period' => $value['periods'],
+				  		'peds_vl_tests' => $value['peds_vl_test'],
+				  		'peds_vl_sppd' => $value['peds_vl_sppd'],
+				  		'adult_vl_tests' => $value['adult_vl_test'],
+				  		'adult_vl_sppd' => $value['adult_vl_suppd'],
+				  		'total_vl_tests' => ($value['peds_vl_test']+$value['adult_vl_test']),
+						'total_vl_sppd' => ($value['peds_vl_sppd']+$value['adult_vl_suppd']),
+						'prop_suppressed_peds' => (int)(($value['peds_vl_sppd']/$value['peds_vl_test'])*100),
+						'prop_suppressed_adults' => (int)(($value['adult_vl_suppd']/$value['adult_vl_test'])*100)
+					);
+		}
+
+		return $viral_load;
 	}
 
 	public function format_county_name($name='')

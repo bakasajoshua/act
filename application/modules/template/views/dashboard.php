@@ -89,11 +89,11 @@
 						?>
 					</div>
 					<div class="row input-group">
-						<div class="col-md-8" id="sub-county">
+						<!-- <div class="col-md-8" id="sub-county">
 							<select class="btn btn-info" name="sub_county_select" id="sub_county_select">
 								<option value="0">Select Sub County</option>
 							</select>
-						</div>
+						</div> -->
 						<div class="col-md-4">
 							<button style="height:30px;" class="btn btn-primary" type="submit"> Filter </button>
 						</div>

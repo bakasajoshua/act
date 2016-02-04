@@ -173,6 +173,7 @@ class api_model extends CI_Model
     	$positive = $this->positive_insert($data['positive']);
     	$enrollment = $this->enrollment_insert($data['enrollment']);
     	$art = $this->art_insert($data['art']);
+        $vl = $this->vl_insert($data['vl']);
     	
     	return TRUE;
     }
@@ -203,6 +204,13 @@ class api_model extends CI_Model
     	$arts_cal = $this->db->insert_batch('dhis_calc_art', $data);
 
     	return TRUE;
+    }
+
+    function vl_insert($data)
+    {
+        $vl_cal = $this->db->insert_batch('vl', $data);
+
+        return TRUE;
     }
 }
 ?>
