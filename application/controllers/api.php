@@ -262,6 +262,7 @@ class api extends MX_Controller
 						'cum_children' => $cum_children,
 						'cum_adults' => $cum_adults,
 						'cum_total' => $cum_total,
+						'hiv_pos_tb_patients' => $value['hiv_pos_tb_patients'],
 						'pregnant_mothers' => $pregnant_mothers
 					);
 			
@@ -364,10 +365,11 @@ class api extends MX_Controller
 			$cum_children = $cum_children+$value['start_art_peds'];
            	$cum_adults = $cum_adults+$value['start_art_adult'];
 			$cum_infants = $cum_infants+$value['start_art_lt_1yr'];
+			$percentage_tb_start_art = (@($value['start_art_tb_patient']/$value['hiv_pos_tb_patients'])*100);
 			$aliveART = $value['on_alt_1st_line']+$value['1st_line_snr_art']+$value['2nd_line_sor_art'];
 			// $retained = ($aliveART/$value['art_net_cht_snr_art'])*100;
 
-			$dhis_enrollment[$key] = array(
+			$dhis_art[$key] = array(
 						'county_ID' => $value['county'],
 				  		'sub_county_ID' => $value['county'],
 				  		'facility_ID' => $value['county'],
@@ -386,12 +388,14 @@ class api extends MX_Controller
 						'net_overall_cohort' => $value['art_net_cht_snr_art'],
 						'alive_on_art' => $aliveART,
 						'retained_on_art' => $value['art_net_cht_snr_art'],
+						'start_art_tb_patient' => $value['start_art_tb_patient'],
+						'percentage_tb_start_art' => $percentage_tb_start_art,
 						'pregnantmothersonART' => $value['prophy_haart']
 					);
 
 		}
 
-		return $dhis_enrollment;
+		return $dhis_art;
 	}
 
 	function calculate_vl($data)

@@ -154,6 +154,69 @@ class second_dashboard extends MY_Model
 		return $data;
 	}
 
+	function hiv_pos_tb_patients()
+	{
+		$id = $this->session->userdata('county_ID');
+		$year = $this->session->userdata('year');
+
+		$sql = "SELECT
+					`hiv_pos_tb_patients`,
+					MONTH(`period`) AS `month`,
+					YEAR(`period`) AS `year`
+				FROM `dhis_calc_positive`
+				WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'";
+		$tb_pos = $this->db->query($sql)->result_array();
+
+		$sql = "SELECT
+					`start_art_tb_patient`,
+					`percentage_tb_start_art`,
+					MONTH(`period`) AS `month`,
+					YEAR(`period`) AS `year`
+				FROM `dhis_calc_art`
+				WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'";
+		$tb_art = $this->db->query($sql)->result_array();
+
+		$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
+
+		$data["hiv_tb"][0]["name"] = "HIV +ve TB Cases";
+        $data["hiv_tb"][0]["type"] = "column";
+        $data["hiv_tb"][0]["yAxis"] = 1;
+
+        $data["hiv_tb"][1]["name"] = "Cases started on ART";
+        $data["hiv_tb"][1]["type"] = "column";
+        $data["hiv_tb"][1]["yAxis"] = 1;
+
+        $data["hiv_tb"][2]["name"] = "% started on ART";
+        $data["hiv_tb"][2]["type"] = "spline";
+
+        $count = 0;
+
+		foreach ($months as $key => $value) {
+			$data["hiv_tb"][0]["data"][$key]	=  $count;
+			$data["hiv_tb"][1]["data"][$key]	=  $count;
+			$data["hiv_tb"][2]["data"][$key]	=  $count;
+		
+			foreach ($tb_pos as $key1 => $value1) {
+				if( (int)$value == (int) $value1["month"]){
+					$data["hiv_tb"][0]["data"][$key]	=  (int) $value1["hiv_pos_tb_patients"];
+				}
+			}
+
+			foreach ($tb_art as $key1 => $value1) {
+				if( (int)$value == (int) $value1["month"]){
+					$data["hiv_tb"][1]["data"][$key]	=  (int) $value1["start_art_tb_patient"];
+					$data["hiv_tb"][2]["data"][$key]	=  (int) $value1["percentage_tb_start_art"];
+				}
+			}
+		}
+
+		$data["hiv_tb"][0]["tooltip"] = array( 'valueSuffix' => 'v');
+		$data["hiv_tb"][1]["tooltip"] = array( 'valueSuffix' => 'v');
+		$data["hiv_tb"][2]["tooltip"] = array( 'valueSuffix' => '%');
+
+		return $data;
+	}
+
 	function get_target_lines($year)
 		{
 			$sql = "SELECT

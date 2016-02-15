@@ -37,6 +37,7 @@
 			$data['infants_cumulative_positive_art'] = $this->second_dashboard->cumulative_infants_started_art();
 			$data['children_cumulative_art_enrollment'] = $this->second_dashboard->cumulative_children_started_art();
 			$data['adults_cumulative_art_enrollment'] = $this->second_dashboard->cumulative_adults_started_art();
+			$data['hiv_pos_tb_patients'] = $this->second_dashboard->hiv_pos_tb_patients();
 
 			$data['children_inneed_treatment'] = $this->second_dashboard->children_need_treatment();
 			$data['adults_inneed_treatment'] = $this->second_dashboard->adults_need_treatment();
