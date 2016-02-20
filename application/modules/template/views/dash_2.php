@@ -1,5 +1,197 @@
 
 <script type="text/javascript">
+    $(function () {
+        $('#containerfirst').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: '90-90-90 Cascade: Children'
+            },
+            xAxis: {
+                categories: ['CLHIV', 'In Care', 'On ART', 'Suppressed']
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: ''
+                },
+                stackLabels: {
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'green'
+                    }
+                }
+            },
+            legend: {
+                align: 'right',
+                x: -70,
+                verticalAlign: 'top',
+                y: 20,
+                floating: true,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                borderColor: '#CCC',
+                borderWidth: 1,
+                shadow: false
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.x +'</b><br/>'+
+                        this.series.name +': '+ this.y +'<br/>'+
+                        'Total: '+ this.point.stackTotal;
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: true,
+                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                        style: {
+                            textShadow: '0 0 3px black, 0 0 3px black'
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: 'Gap',
+                data: [null, 79595, 71285, 84535]
+            }, {
+                name: 'Achieved',
+                data: [179894, 82310, 74429, 46608]
+            }]
+        });
+    });
+
+    $(function () {
+        $('#containersecond').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: '90-90-90 Cascade: Adults'
+            },
+            xAxis: {
+                categories: ['ALHIV', 'In Care', 'On ART', 'Suppressed']
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: ''
+                },
+                stackLabels: {
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                    }
+                }
+            },
+            legend: {
+                align: 'right',
+                x: -70,
+                verticalAlign: 'top',
+                y: 20,
+                floating: true,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                borderColor: '#CCC',
+                borderWidth: 1,
+                shadow: false
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.x +'</b><br/>'+
+                        this.series.name +': '+ this.y +'<br/>'+
+                        'Total: '+ this.point.stackTotal;
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: true,
+                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                        style: {
+                            textShadow: '0 0 3px black, 0 0 3px black'
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: 'Gap',
+                data: [null, 446642, 411733, 626731]
+            }, {
+                name: 'Achieved',
+                data: [1451045, 859299, 763613, 431081]
+            }]
+        });
+    });
+
+    $(function () {
+        $('#containerthird').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: '90-90-90 Cascade: Overall'
+            },
+            xAxis: {
+                categories: ['PLHIV', 'In Care', 'On ART', 'Suppressed']
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: ''
+                },
+                stackLabels: {
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold',
+                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                    }
+                }
+            },
+            legend: {
+                align: 'right',
+                x: -70,
+                verticalAlign: 'top',
+                y: 20,
+                floating: true,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                borderColor: '#CCC',
+                borderWidth: 1,
+                shadow: false
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.x +'</b><br/>'+
+                        this.series.name +': '+ this.y +'<br/>'+
+                        'Total: '+ this.point.stackTotal;
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: true,
+                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                        style: {
+                            textShadow: '0 0 3px black, 0 0 3px black'
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: 'Gap',
+                data: [null, 526236, 483019, 711266]
+            }, {
+                name: 'Achieved',
+                data: [1630939, 941609, 838042, 477689]
+            }]
+        });
+    });
+
 	$(function () {
         $('#container1').highcharts({
             title: {

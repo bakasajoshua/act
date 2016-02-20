@@ -125,12 +125,14 @@
 	<!-- begin tabs -->
 	<div class="col-md-12">
 		<ul class="nav nav-tabs">
-			<li class="active"><a href="#default-tab-1" data-toggle="tab">1st-90 Dashboard</a></li>
+			<li class=""><a href="#default-tab-1" data-toggle="tab">1st-90 Dashboard</a></li>
 			<li class=""><a href="#default-tab-2" data-toggle="tab">2nd-90 Dashboard</a></li>
 			<li class=""><a href="#default-tab-3" data-toggle="tab">3rd-90 Dashboard</a></li>
+			<li class="active"><a href="#default-tab-4" data-toggle="tab">90-90-90 Cascade</a></li>
 		</ul>
 		<div class="tab-content">
-			<div class="tab-pane fade active in" id="default-tab-1">
+			
+			<div class="tab-pane fade" id="default-tab-1">
 				<div class="row">
 					<div class="col-md-4">
 						<div class="panel panel-inverse">
@@ -279,7 +281,28 @@
 					</div>
 				</div>
 			</div>
+			<div class="tab-pane fade active in" id="default-tab-4">
+				<div class="row">
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="containerfirst"></div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="containersecond"></div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="panel panel-inverse">
+				    	    <div class="panel-body" id="containerthird"></div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
 		</div>
+
 	</div>
 	<!-- end tabs -->
     
@@ -308,8 +331,7 @@
 		});
 	});
 </script>
-<?php 
-	$this->load->view('dropdown');
+<?php
 	$this->load->view('dash_2');
 ?>
 
