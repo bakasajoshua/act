@@ -420,6 +420,7 @@ class api extends MX_Controller
 		return $viral_load;
 	}
 
+
 	public function format_county_name($name='')
 	{
 		$new_name = '';

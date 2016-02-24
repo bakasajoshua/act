@@ -57,5 +57,12 @@
 
 			return $data;
 		}
+
+		public function cascaded()
+		{
+			$this->load->model('cascade');
+
+			// $data['cascaded_children'] = $this->cascade->cascade_children();
+		}
 	}
 ?>
