@@ -37,9 +37,9 @@ class api extends MX_Controller
 	{
 		$count=0;
 		$sub_counties=array();
-		
+		// echo "<pre>";print_r($data);die();
 		//getting the stored counties in the database
-		$db_counties = $this->api_model->counties();
+		$db_counties = $this->api_model->get_counties();
 		//Formatting the received counties to be in the same format as the ones from the DB
 		foreach ($data as $key => $value){
 			$eid_counties = $this->format_county_name($value['County']);
@@ -60,11 +60,18 @@ class api extends MX_Controller
 
 		$counter=0;
 		$cols = array();
+
 		//Data formatting to match the db cols and rows
 		foreach ($data as $key => $value) {
 			//Isolating the title column
 			if ($key==0) {
 				foreach ($value as $k => $v) {
+					//Renaming the organizational unit name and the organozaional description to sub county and county respectively
+					if($v == 'organisationunitname')
+						$v = 'subcounty';
+					else if ($v == 'organisationunitdescription')
+						$v = 'county';
+
 					//removing the spaces in the title column names
 					$v = strtolower(str_replace(" ", "", $v));
 					$cols[] = $v;
@@ -80,7 +87,7 @@ class api extends MX_Controller
 			}
 			
 		}
-		
+		// echo "<pre>";print_r($new);die();
 		//Getting back the aggregated values from the raw data
 		$insert_data = $this->sub_formating_data($new);
 		$insert = $this->api_model->dhis_insert_aggregation($insert_data);
@@ -88,18 +95,56 @@ class api extends MX_Controller
 
 	function sub_formating_data($data)
 	{
-		
-		foreach ($data as $k => $v) {
-			//Assigning the county_ID to the corresponding county_name
-			$county = $this->format_county_name($v['county']);
-			$counties = $this->api_model->counties($county);
-			$data[$k]['county'] = $counties[0]['county_ID'];
-			
-			//Formatting the period of the data to php
-			$dates = date_parse($v['periods']);
-			$data_date = $dates['day'].'-'.$dates['month'].'-'.$dates['day'];
-			$data[$k]['periods'] = $data_date;
+		// echo "<pre>";print_r($data);die();
+		$unitname = array();
+		$county = array();
+		$subCounty = array();
 
+		foreach ($data as $k => $v) {
+			// echo "<pre>";print_r($v);
+			foreach ($v as $key => $value) {
+				if ($key=='subcounty') {
+					$disintegrated = $this->units_disintegrate($value);
+					$data[$k]['subcounty'] = $disintegrated['subcounty'];
+					$data[$k]['county'] = $disintegrated['county'];
+				}
+			}
+		}
+		
+		foreach ($data as $key => $value) {
+			//Formatting the period of the data to php
+			$dates = date_parse($value['periodname']);
+			$yr = substr($value['periodid'], 0, 4);
+			$dates['year'] = $yr;
+			$data_date = $dates['year'].'-'.$dates['month'].'-'.$dates['day'];
+			$data[$key]['periodname'] = $data_date;
+		}
+		
+		foreach ($data as $key => $value) {
+			$subCounty = array();
+
+			$countyName = $this->api_model->counties($this->format_county_name($value['county']));
+
+			//Removing apostrophe in any sub county name
+			if (strpos($value['subcounty'], '\'') !== false) {
+			    $sub = explode("'", $value['subcounty']);
+			    $value['subcounty'] = $sub[0].$sub[1];
+			}
+				
+			$subCounty = $this->api_model->get_subcounty_by_name($value['subcounty']);
+
+			//Inserting any new sub county in the new data
+			if (!$subCounty) {
+				// echo $value['subcounty'];die();
+				$added_data = array(
+									'sub_county_name' => $value['subcounty'],
+									'county_ID' => $countyName[0]['county_ID']
+									);
+				$subCounty[0]['sub_county_ID'] = $this->api_model->insert_missing_sub_counties($added_data);
+			}
+
+			$data[$key]['county'] = $countyName[0]['county_ID'];
+			$data[$key]['subcounty'] = $subCounty[0]['sub_county_ID'];
 		}
 		
 		//Organizing the data to and calculating the required aggregates:
@@ -108,32 +153,40 @@ class api extends MX_Controller
 		//		Enrollment
 		//		ART
 		$newdata['tests'] = $this->calculate_dhis_tests($data);
-		$newdata['positive'] = $this->calculate_dhis_positive($data);
-		$newdata['enrollment'] = $this->calculate_dhis_enrollment($data);
-		$newdata['art'] = $this->calculate_dhis_art($data);
-		$newdata['vl'] = $this->calculate_vl($data);
+		// $newdata['positive'] = $this->calculate_dhis_positive($data);
+		// $newdata['enrollment'] = $this->calculate_dhis_enrollment($data);
+		// $newdata['art'] = $this->calculate_dhis_art($data);
+		// $newdata['vl'] = $this->calculate_vl($data);
 		// echo "<pre>";print_r($newdata['art']);die();
 
 		return $newdata;
 	}
 
 	function calculate_dhis_tests($data){
-		$cumulative_eid=0;
 		$cumulative_children=0;
 		$cumulative_adults=0;
-		$cumulative_total=0;
 		$next = NULL;
+		$yr = NULL;
         foreach ($data as $key => $value) {
-        	if ($next == NULL) {//Checking if it is the first Iteration and setting the next value the same as the county name
-        		$next = $value['county'];
+        	$curr_date = date_parse($value['periodname']);
+        	if ($yr == NULL) {
+        		$yr = $curr_date['year'];
         	} else {
-        		if($next != $value['county'])//Checking if the next value is equivalent to the current county in process then reset the cummulatives if different
+        		if($yr != $curr_date['year'])//Checking if the year value is equivalent to the current year in process then reset the cummulatives if different
         		{
-        			$cumulative_eid=0;
         			$cumulative_children=0;
 					$cumulative_adults=0;
-					$cumulative_total=0;
-					$next = $value['county'];
+					$yr = $curr_date['year'];
+        		}
+        	}
+        	if ($next == NULL) {//Checking if it is the first Iteration and setting the next value the same as the sub county
+        		$next = $value['subcounty'];
+        	} else {
+        		if($next != $value['subcounty'])//Checking if the next value is equivalent to the current sub county in process then reset the cummulatives if different
+        		{
+        			$cumulative_children=0;
+					$cumulative_adults=0;
+					$next = $value['subcounty'];
         		}
         	}
         	
@@ -160,30 +213,23 @@ class api extends MX_Controller
 			//   		'dtc_inmale_lt14' => $value['dtcoutpatienttested(male,children_lt14yrs)'],
 			//   		'dtc_outmale_lt14' => $value['dtcinpatienttested(male,children_lt14yrs)']
 			// 	);
-			$total_eid = $value['eid_tests'];
-			$total_children = $value['tested_peds'];
-			$total_adults = $value['tested_adult'];
-			$total = $value['tested_total'];
-			$cumulative_eid = $cumulative_eid+$total_eid;
+			$total_children = @$value['dtcinpatienttested(female,children<14yrs)']+@$value['dtcinpatienttested(male,children<14yrs)']+@$value['dtcoutpatienttested(female,children<14yrs)']+@$value['dtcoutpatienttested(male,children<14yrs)'];
+			$total_adults = @$value['vctclientstested(15-24yrs,female)']+@$value['vctclientstested(15-24yrs,male)']+@$value['vctclientstested(female,>25yrs)']+@$value['vctclientstested(male,>25yrs)']+@$value['dtcinpatienttested(female,adult>14yrs)']+@$value['dtcinpatienttested(male,adult>14yrs)']+@$value['dtcoutpatienttested(female,adult>14yrs)']+@$value['dtcoutpatienttested(male,adult>14yrs)']+@$value['antenataltestingforhiv']+@$value['labouranddeliverytestingforhiv']+@$value['[postnatal(within72hrs)testingforhiv'];
 			$cumulative_children = $cumulative_children+$total_children;
 			$cumulative_adults = $cumulative_adults+$total_adults;
-			$cumulative_total = $cumulative_total+$total;
 			$dhis_tests[$key] = array(
 				  		'county_ID' => $value['county'],
-						'sub_county_ID' => $value['county'],
+						'sub_county_ID' => $value['subcounty'],
 						'facility_ID' => $value['county'],
-						'period' => $value['periods'],
-						'eid' => $total_eid,
+						'period' => $value['periodname'],
 						'total_children' => $total_children,
 						'total_adults' => $total_adults,
-						'total' => $total,
-						'cum_eid' => $cumulative_eid,
 						'cum_children' => $cumulative_children,
-						'cum_adults' => $cumulative_adults,
-						'cum_total' => $cumulative_total
+						'cum_adults' => $cumulative_adults
 					);
 			
         }
+        echo "<pre>";print_r($dhis_tests);die();
         
 		return $dhis_tests;
 
@@ -418,6 +464,44 @@ class api extends MX_Controller
 		}
 
 		return $viral_load;
+	}
+
+	function units_disintegrate($data)
+	{
+		$subcounty_Name = array();
+		$return_array = array();
+		$dis_array = explode('/', $data);
+		//County disintegraion
+		if (is_array(explode(' County', $dis_array[2]))) {
+			$county_Name = explode(' County', $dis_array[2]);
+		}
+		//Sub County disintergration
+		if (strpos($dis_array[3], 'Sub') !== false) {
+		    $subcounty_Name = explode(' Sub', $dis_array[3]);
+		}else if (strpos($dis_array[3], 'sub') !== false) {
+			$subcounty_Name = explode(' sub', $dis_array[3]);
+		}else if (strpos($dis_array[3], 'S.C') !== false) {
+			$subcounty_Name = explode(' S.C', $dis_array[3]);
+		}
+		else {
+			$subcounty_Name[0] = $dis_array[3];
+		}
+		//else if (strpos($dis_array[3], 'Sub-county') !== false) {
+		// 	$subcounty_Name = explode(' S.C', $dis_array[3]);
+		// }
+		// if (is_array(explode(' Sub-', $dis_array[3]))) {
+		// 	$subcounty_Name = explode(' Sub', $dis_array[3]);
+		// }
+		// else if (is_array(explode(' sub', $dis_array[3]))) {
+		// 	$subcounty_Name = explode(' sub', $dis_array[3]);
+		// }else 
+		
+		// echo "<pre>";print_r($subcounty_Name);die();
+		$return_array = array(
+							'county' => $county_Name[0],
+							'subcounty' => rtrim($subcounty_Name[0]," ")
+							 );
+		return $return_array;
 	}
 
 

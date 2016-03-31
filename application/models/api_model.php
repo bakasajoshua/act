@@ -19,6 +19,14 @@ class api_model extends CI_Model
         return $new_db_counties;
     }
 
+    function get_counties()
+    {
+        return $this->db->query("SELECT
+                                    `county_ID`,
+                                    `county_name`
+                                FROM `counties`")->result_array();
+    }
+
 	function counties($name)
     {
         /*
@@ -35,9 +43,38 @@ class api_model extends CI_Model
         foreach ($data as $key => $value) {
             $sub_county_name = $value['sub_county_name'];
             $county_ID = $value['county_ID'];
-            $insert = $this->db->query("INSERT IGNORE INTO `sub_counties` (`sub_county_name`,`county_ID`) VALUES('$sub_county_name','$county_ID')");
+            $insert = $this->db->query('INSERT IGNORE INTO `sub_counties` (`sub_county_name`,`county_ID`) VALUES("$sub_county_name","$county_ID")');
         }
         return $insert;
+    }
+
+    //Addition of the missing sub counties
+    function insert_missing_sub_counties($data)
+    {
+        $sub_county_name = $data['sub_county_name'];
+        $county_ID = $data['county_ID'];
+        $sql = "INSERT IGNORE INTO `sub_counties` (`sub_county_name`,`county_ID`) VALUES('$sub_county_name','$county_ID')";
+        // echo $sql;die();
+        $insert = $this->db->query($sql);
+        
+        return $this->db->insert_id();
+    }
+
+    function get_subcounty_by_name($name){
+        $this->db->where('sub_county_name', $name);
+        return $this->db->get('sub_counties')->result_array();
+        // return $this->db->query("SELECT
+        //                             `sub_county_ID`,
+        //                             `sub_county_name`
+        //                         FROM `sub_counties`
+        //                         WHERE `sub_county_name` = '$name'")->result_array();
+    }
+
+    function subCounties($name)
+    {
+        $this->db->where('sub_county_name',$name);
+        return $this->db->get('sub_counties')->result_array();
+        
     }
 
     function formatting_eid_data($data,$year,$month){

@@ -413,8 +413,7 @@
 			//Getting the number of children positive for the selected county
 			$sql = "SELECT
 						MONTH(`dp`.`period`) AS `month`,
-						YEAR(`dp`.`period`) AS `year`,
-						`dp`.`cum_total` AS `cumulative_positive_total`
+						YEAR(`dp`.`period`) AS `year`
 					FROM `dhis_calc_positive` `dp`
 					WHERE `dp`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
 			$positive = $this->db->query($sql)->result_array();
@@ -439,7 +438,7 @@
 				$data["total_posen"][1]["data"][$key]	=  $count;
 				foreach ($positive as $key1 => $value1) {
 					if( (int)$value == (int) $value1["month"]){
-						$data["total_posen"][0]["data"][$key]	=  (int) $value1["cumulative_positive_total"];
+						// $data["total_posen"][0]["data"][$key]	=  (int) $value1["cumulative_positive_total"];
 					}
 				}
 
