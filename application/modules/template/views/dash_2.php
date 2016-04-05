@@ -54,13 +54,7 @@
                     }
                 }
             },
-            series: [{
-                name: 'Gap',
-                data: [null, 79595, 71285, 84535]
-            }, {
-                name: 'Achieved',
-                data: [179894, 82310, 74429, 46608]
-            }]
+            series: <?php echo json_encode($cascaded['cascaded_children']['cascade_children']);?>
         });
     });
 
@@ -118,13 +112,7 @@
                     }
                 }
             },
-            series: [{
-                name: 'Gap',
-                data: [null, 446642, 411733, 626731]
-            }, {
-                name: 'Achieved',
-                data: [1451045, 859299, 763613, 431081]
-            }]
+            series: <?php echo json_encode($cascaded['cascaded_adults']['cascade_adults']);?>
         });
     });
 
