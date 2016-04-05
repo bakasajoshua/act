@@ -33,6 +33,88 @@ class api extends MX_Controller
 		// redirect(base_url().'api');
 	}
 
+	function format_cascade($data)
+	{
+		$counter=0;
+		$cols = array();
+
+		//Data formatting to match the db cols and rows
+		foreach ($data as $key => $value) {
+			//Isolating the title column
+			if ($key==0) {
+				foreach ($value as $k => $v) {
+					//removing the spaces in the title column names
+					$v = strtolower($v);
+					
+					//Renaming the organizational unit name and the organozaional description to sub county and county respectively
+					if($k == 0)
+						$v = 'county_ID';
+					else if($k == 1)
+						$v = 'sub_county_ID';
+					else if($k == 3)
+						$v = 'children target for identification';
+					else if ($k == 4)
+						$v = 'children  target for treatment';
+					else if ($k == 5)
+						$v = 'children  target for viral suppression';
+					else if($k == 7)
+						$v = 'adults target for identification';
+					else if ($k == 8)
+						$v = 'adults  target for treatment';
+					else if ($k == 9)
+						$v = 'adults  target for viral suppression';
+
+					$cols[] = str_replace(" ", "", $v);
+				}
+			}
+			else
+			{
+				//Assigning the title columns as keys for the rest of the data
+				foreach ($value as $k => $v) {
+					$new[$counter][$cols[$k]] = $v;
+				}
+				$counter++;
+			}
+			
+		}
+		$subcounty_Name = array();
+		foreach ($new as $key => $value) {
+			foreach ($value as $k => $v) {
+				if ($k=='sub_county_ID') {
+					// echo "<pre>";print_r($v);
+					//Sub County disintergration
+					if (strpos($v, 'Sub') !== false) {
+					    $subcounty_Name = explode(' Sub', $v);
+					}else if (strpos($v, 'sub') !== false) {
+						$subcounty_Name = explode(' sub', $v);
+					}else if (strpos($v, 'S.C') !== false) {
+						$subcounty_Name = explode(' S.C', $v);
+					}
+					else {
+						$subcounty_Name[0] = $v;
+					}
+					$new[$key]['sub_county_ID'] = $subcounty_Name[0];
+					$new[$key]['period'] = '2015-12-15';
+				}
+			}
+		}
+		// echo "<pre>";print_r($new);die();
+		foreach ($new as $key => $value) {
+			$countyName = $this->api_model->counties($this->format_county_name($value['county_ID']));
+			$subCounty = $this->api_model->get_subcounty_by_name($value['sub_county_ID']);
+
+			if ($countyName) {
+				$new[$key]['county_ID'] = $countyName[0]['county_ID'];
+			}
+			if ($subCounty) {
+				$new[$key]['sub_county_ID'] = $subCounty[0]['sub_county_ID'];
+			}
+			
+			
+		}
+		$insert = $this->api_model->cascade_insert($new);
+	}
+
 	function add_missing_sub_counties($data)
 	{
 		$count=0;
@@ -90,6 +172,7 @@ class api extends MX_Controller
 		// echo "<pre>";print_r($new);die();
 		//Getting back the aggregated values from the raw data
 		$insert_data = $this->sub_formating_data($new);
+		echo "<pre>";print_r($insert_data);die();
 		$insert = $this->api_model->dhis_insert_aggregation($insert_data);
 	}
 
@@ -153,7 +236,7 @@ class api extends MX_Controller
 		//		Enrollment
 		//		ART
 		$newdata['tests'] = $this->calculate_dhis_tests($data);
-		// $newdata['positive'] = $this->calculate_dhis_positive($data);
+		$newdata['positive'] = $this->calculate_dhis_positive($data);
 		// $newdata['enrollment'] = $this->calculate_dhis_enrollment($data);
 		// $newdata['art'] = $this->calculate_dhis_art($data);
 		// $newdata['vl'] = $this->calculate_vl($data);
@@ -229,30 +312,38 @@ class api extends MX_Controller
 					);
 			
         }
-        echo "<pre>";print_r($dhis_tests);die();
         
 		return $dhis_tests;
 
 	}
 
 	function calculate_dhis_positive($data){
-		$cum_eid=0;
 		$cum_children=0;
 		$cum_adults=0;
-		$cum_total=0;
 		$next = NULL;
-		
+		$yr = NULL;
 		foreach ($data as $key => $value) {
-			if ($next == NULL) {//Checking if it is the first Iteration and setting the next value the same as the county name
-        		$next = $value['county'];
+			$curr_date = date_parse($value['periodname']);
+        	if ($yr == NULL) {
+        		$yr = $curr_date['year'];
         	} else {
-        		if($next != $value['county'])//Checking if the next value is equivalent to the current county in process then reset the cummulatives if different
+        		if($yr != $curr_date['year'])//Checking if the year value is equivalent to the current year in process then reset the cummulatives if different
+        		{
+        			$cum_children=0;
+					$cum_adults=0;
+					$yr = $curr_date['year'];
+        		}
+        	}
+			if ($next == NULL) {//Checking if it is the first Iteration and setting the next value the same as the county name
+        		$next = $value['subcounty'];
+        	} else {
+        		if($next != $value['subcounty'])//Checking if the next value is equivalent to the current sub county in process then reset the cummulatives if different
         		{
         			$cum_eid=0;
         			$cum_children=0;
 					$cum_adults=0;
 					$cum_total=0;
-					$next = $value['county'];
+					$next = $value['subcounty'];
         		}
         	}
 			// $dhis_positive[0] =  array(
@@ -278,42 +369,28 @@ class api extends MX_Controller
 			// 		  	'known_positive_status' => $value['knownpositivestatus']
 			// 		);
 			//Positive Calculations
-        	$total_eid = $value['eid_pos'];
-			$total_children = $value['pos_peds'];
-			$total_adults = $value['pos_adult'];
-			$total = $value['pos_total'];
-			$infants_positivity = (@($value['eid_pos']/$value['eid_tests'])*100);
-			$children_positivity = (@($value['pos_peds']/$value['tested_peds'])*100);
-			$adults_positivity = (@($value['pos_adult']/$value['tested_adult'])*100);
-			$cum_eid = $cum_eid+$total_eid;
-			$cum_children= ($cum_children+$total_children);
-			$cum_adults = ($cum_adults+$total_adults);
-			$cum_total = ($cum_total+$total);
+        	$total_children = @$value['dtcinpatienthiv+ve(female,children<14yrs)']+@$value['dtcinpatienthiv+ve(male,children<14yrs)']+@$value['dtcoutpatienthiv+ve(female,children<14yrs)']+@$value['dtcoutpatienthiv+ve(male,children<14yrs)'];
+			$total_adults = @$value['vctclientshiv+ve(15-24yrs,female)']+@$value['vctclientshiv+ve(female,>25yrs)']+@$value['vctclientshiv+ve(15-24yrs,male)']+@$value['vctclientshiv+ve(male,>25yrs)'];
+			$cum_children= (@$cum_children+@$total_children);
+			$cum_adults = (@$cum_adults+@$total_adults);
 			$pregnant_mothers = ($value['anc_pos']+$value['lab_dev_pos']+$value['pnc_pos']+$value['monthers_ks']);
 
 			//Positive Data Structuring
 			$dhis_positive[$key] = array(
 				  		'county_ID' => $value['county'],
-				  		'sub_county_ID' => $value['county'],
+				  		'sub_county_ID' => $value['subcounty'],
 				  		'facility_ID' => $value['county'],
-				  		'period' => $value['periods'],
-				  		'eid' => $total_eid,
-						'total_children' => $total_children,
+				  		'period' => $value['periodname'],
+				  		'total_children' => $total_children,
 						'total_adults' => $total_adults,
-						'total' => $total,
-						'infants_positivity' => $infants_positivity,
-						'children_positivity' => $children_positivity,
-						'adults_positivity' => $adults_positivity,
-						'cum_eid' => $cum_eid,
 						'cum_children' => $cum_children,
 						'cum_adults' => $cum_adults,
-						'cum_total' => $cum_total,
 						'hiv_pos_tb_patients' => $value['hiv_pos_tb_patients'],
 						'pregnant_mothers' => $pregnant_mothers
 					);
 			
 		}
-
+		echo "<pre>";print_r($dhis_positive);die();
 		return $dhis_positive;
 	}
 

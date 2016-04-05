@@ -192,7 +192,7 @@
         });
     });
 
-	$(function () {
+/*	$(function () {
         $('#container1').highcharts({
             title: {
                 text: 'Cumulative: Number of Infants tested for HIV',
@@ -1467,7 +1467,7 @@ $(function () {
                 data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2]
             }]
         });
-    });
+    });*/
     
     
 </script>

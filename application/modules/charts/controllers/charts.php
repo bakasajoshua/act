@@ -62,7 +62,7 @@
 		{
 			$this->load->model('cascade');
 
-			// $data['cascaded_children'] = $this->cascade->cascade_children();
+			$data['cascaded_children'] = $this->cascade->cascade_children();
 		}
 	}
 ?>

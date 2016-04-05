@@ -20,7 +20,7 @@ class tests extends MY_Controller
 		//Variable determining the data type being handled
 		//		counties => inserting counties
 		//		dhis 	 => inserting dhis data
-		$data_handler='dhis';
+		$data_handler='cascade';
 
 		if (isset($_FILES)) {
 			$file = $_FILES['upload'];
@@ -58,8 +58,11 @@ class tests extends MY_Controller
 					$this->db->query("INSERT IGNORE INTO `counties` (`county_name`) VALUES ('".$value."')");
 				
 			}
-			
-			redirect('tests/upload_csv');
+			else if ($data_handler == 'cascade') 
+			{
+				$this->load->library('../controllers/api');
+				$this->api->format_cascade($sheet_data);
+			}
 		}
 	}
 }

@@ -22,9 +22,9 @@ class dashboard extends MY_Controller
 		//Data array to be displayed
 		$data['counties'] = $this->select_county();
 		$data['cascaded'] = $this->charts->cascaded();
-		$data['first_ninety']= $this->charts->first_dashboard();
-		$data['second_ninety'] = $this->charts->second_dashboard();
-		$data['third_ninety'] = $this->charts->third_dashboard();
+		// $data['first_ninety']= $this->charts->first_dashboard();
+		// $data['second_ninety'] = $this->charts->second_dashboard();
+		// $data['third_ninety'] = $this->charts->third_dashboard();
 
 		$data['breadcrumb'] = $this->breadcrumb();
 

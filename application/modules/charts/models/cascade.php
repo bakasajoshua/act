@@ -12,42 +12,41 @@ if(!defined('BASEPATH')) exit('No direct access to script allowed!');
 		{
 			parent:: __construct();
 		}
+
+		function cascade_children()
+		{
+			$id = $this->session->userdata('county_ID');
+			$year = $this->session->userdata('year');
+			$clhiv = 0;
+			$childrenachievedIncare = 0;
+			$childrengapIncare = 0;
+			$childrenachievedTreatment = 0;
+			$childrengapTreatment = 0;
+			$childrenachievedSuppression = 0;
+			$childrengapSuppression = 0;
+
+			$sql = "SELECT
+						*
+					FROM `cascade`
+					WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'";
+			$return = $this->db->query($sql)->result_array();
+
+			foreach ($return as $key => $value) {
+				$calculated_data = array(
+									'clhiv' => @$clhiv+@$value['clhiv'],
+									'childrenachievedIncare' => @$childrenachievedIncare+@$value['childrenactualforidentification'],
+									'clhiv' => @$clhiv+@$value['clhiv'],
+									'childrengapIncare' => @$childrengapIncare+(@$value['childrentargetforidentification']-@$value['childrenactualforidentification']),
+									'childrenachievedTreatment' => @$childrenachievedTreatment+@$value['childrenactualfortreatment'],
+									'childrengapTreatment' => @$childrengapTreatment+(@$value['childrentargetfortreatment']-@$value['childrenactualfortreatment']),
+									'childrenachievedSuppression' => @$childrenachievedSuppression+@$value['childrenactualforviralsuppression'],
+									'childrengapSuppression' => @$childrengapSuppression+(@$value['childrentargetforviralsuppression']-@$value['childrenactualforviralsuppression'])
+									);
+			}
+
+			echo "<pre>";print_r($calculated_data);die();
+		}
 	}
 
-	function in_care()
-	{
-		$id = $this->session->userdata('county_ID');
-		$year = $this->session->userdata('year');
-
-		$sql = "SELECT
-					MONTH(`period`) AS `month`,
-					`curr_care_peds`,
-					`curr_care_adults`,
-					`curr_care_total`
-				FROM `dhis_calc_enrollment`
-				WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year' AND MONTH(`period`) = '12'";
-
-		return $this->db->query($sql)->result_array();
-	}
-
-	function on_art()
-	{
-		$id = $this->session->userdata('county_ID');
-		$year = $this->session->userdata('year');
-
-		$sql = "SELECT
-					MONTH(`period`) AS `month`,
-					`curr_art_peds`,
-					`curr_art_adults`,
-					`curr_art_total`
-				FROM `dhis_calc_art`
-				WHERE `county_ID` = '0' AND YEAR(`period`) = '2015' AND MONTH(`period`) = '12'";
-
-		return $this->db->query($sql)->result_array();
-	}
-
-	function cascade_children()
-	{
-
-	}
+	
 ?>

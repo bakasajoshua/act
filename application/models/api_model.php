@@ -77,6 +77,13 @@ class api_model extends CI_Model
         
     }
 
+    function cascade_insert($data)
+    {
+        $this->db->insert_batch('cascade', $data);
+
+        return TRUE;
+    }
+
     function formatting_eid_data($data,$year,$month){
         $sub_counties = $this->db->get('sub_counties')->result_array();
         // echo "<pre>";print_r($data);die();
