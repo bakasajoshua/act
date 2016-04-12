@@ -12,6 +12,7 @@ class dashboard_model extends MY_Model
 
 	function get_single_county($id){
 		$this->db->where('county_ID',$id);
+		// echo "<pre>";print_r($this->db->get('counties')->result_array());die();
 		return $this->db->get('counties')->result_array();
 	}
 	function get_single_sub_county($id){

@@ -20,7 +20,7 @@ class tests extends MY_Controller
 		//Variable determining the data type being handled
 		//		counties => inserting counties
 		//		dhis 	 => inserting dhis data
-		$data_handler='cascade';
+		$data_handler='dhis';
 
 		if (isset($_FILES)) {
 			$file = $_FILES['upload'];

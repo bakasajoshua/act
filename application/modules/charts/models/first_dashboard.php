@@ -12,24 +12,31 @@
 
 		function cumulative_infants_tests_vs_positive()
 		{
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
 
+			if ($sid==0) {
+				$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			} else {
+				$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			}
+			
 			$sql = "SELECT
 						`cum_eid` AS `cumulative_infants_test`,
 						MONTH(`period`) AS `month`,
 						YEAR(`period`) AS `year`
 					FROM `dhis_calc_tests`
-					WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'
+					$addition
 					GROUP BY `period`";
 			$eid_test = $this->db->query($sql)->result_array();
 			
 			$sql = "SELECT
-						`eid` AS `cumulative_infants_positive`,
+						`cum_eid` AS `cumulative_infants_positive`,
 						MONTH(`period`) AS `month`,
 						YEAR(`period`) AS `year`
 					FROM `dhis_calc_positive`
-					WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'
+					$addition
 					GROUP BY `period`";
 			$eid_pos = $this->db->query($sql)->result_array();
 
@@ -60,8 +67,16 @@
 
 		function cumulative_children_tests_vs_positive()
 		{
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			} else {
+				$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			}
+			
 			// echo "<pre>";print_r($id);echo "</pre>";
 			// $condition = isset($id['sub_county_ID'])? "`dt`.`sub_county_ID` = $id['sub_county_ID']": "`dt`.`county_ID` = $id['county_ID']";
 			// if ($id['sub_county_ID']==0) {
@@ -75,7 +90,7 @@
 						YEAR(`dt`.`period`) AS `year`,
 						`dt`.`cum_children` AS `cumulative_tested_children`
 					FROM `dhis_calc_tests` `dt`
-					WHERE `dt`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
+					$addition";
 			$test = $this->db->query($sql)->result_array();
 			// echo "<pre>";print_r($sql);echo "</pre>";
 			$sql = "SELECT
@@ -83,7 +98,7 @@
 						YEAR(`dp`.`period`) AS `year`,
 						`dp`.`cum_children` AS `cumulative_positive_children`
 					FROM `dhis_calc_positive` `dp`
-					WHERE `dp`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
+					$addition";
 			$positive = $this->db->query($sql)->result_array();
 			// echo "<pre>";print_r($sql);echo "</pre>";die();
 			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
@@ -114,8 +129,16 @@
 		}
 
 		function cumulative_adults_tests_vs_positive(){
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			} else {
+				$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			}
+			
 
 			// Getting the cumulative DHIS tests in the selected county
 			$sql = "SELECT
@@ -123,7 +146,7 @@
 						YEAR(`dt`.`period`) AS `year`,
 						`dt`.`cum_adults` AS `cumulative_tested_adults`
 					FROM `dhis_calc_tests` `dt`
-					WHERE `dt`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
+					$addition";
 			$test = $this->db->query($sql)->result_array();
 			
 			// Getting the cumulative DHIS positives in the selected county
@@ -132,7 +155,7 @@
 						YEAR(`dp`.`period`) AS `year`,
 						`dp`.`cum_adults` AS `cumulative_positive_adults`
 					FROM `dhis_calc_positive` `dp`
-					WHERE `dp`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
+					$addition";
 			$positive = $this->db->query($sql)->result_array();
 
 			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
@@ -165,19 +188,26 @@
 
 		function infants_positive()
 		{
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
 
+			if ($sid==0) {
+				$addition = "WHERE `dcp`.`county_ID` = $cid AND YEAR(`dcp`.`period`) = $year AND `dct`.`county_ID` = $cid AND YEAR(`dct`.`period`) = $year";
+			} else {
+				$addition = "WHERE `dcp`.`sub_county_ID` = $sid AND YEAR(`dcp`.`period`) = $year AND `dct`.`sub_county_ID` = $sid AND YEAR(`dct`.`period`) = $year";
+			}
+			
 			$sql = "SELECT
-						`eid` AS `infants_positive`,
-						`infants_positivity` AS `infants_positivity`,
-						MONTH(`period`) AS `month`,
-						YEAR(`period`) AS `year`
-					FROM `dhis_calc_positive`
-					WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'
-					GROUP BY `period`";
+						`dcp`.`eid` AS `infants_positive`,
+						(`dcp`.`eid`/`dct`.`eid`) AS `infants_positivity`,
+						MONTH(`dcp`.`period`) AS `month`,
+						YEAR(`dcp`.`period`) AS `year`
+					FROM `dhis_calc_positive` `dcp`, `dhis_calc_tests` `dct`
+					$addition
+					GROUP BY `dcp`.`period`";
 			$positive = $this->db->query($sql)->result_array();
-
+			
 			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
 
 			$data["infant_pos"][0]["name"] = 'positive';
@@ -204,7 +234,7 @@
 				//Generating the points for the positive line
 				foreach ($positive as $key1 => $value1) {
 					if( (int)$value == (int) $value1["month"]){
-						$data["infant_pos"][1]["data"][$key]	=  (int) $value1["infants_positivity"];
+						$data["infant_pos"][1]["data"][$key]	=  ((int) $value1["infants_positivity"]*100);
 					}
 				}
 				$data["infant_pos"][1]["tooltip"] = array('valueSuffix' => '%' );
@@ -214,19 +244,26 @@
 		}
 
 		function children_positive(){
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$addition = "WHERE `dcp`.`county_ID` = $cid AND YEAR(`dcp`.`period`) = $year AND `dct`.`county_ID` = $cid AND YEAR(`dct`.`period`) = $year";
+			} else {
+				$addition = "WHERE `dcp`.`sub_county_ID` = $sid AND YEAR(`dcp`.`period`) = $year AND `dct`.`sub_county_ID` = $sid AND YEAR(`dct`.`period`) = $year";
+			}
 
 			// Getting the DHIS positives in the selected county
 			$sql = "SELECT
-						MONTH(`dp`.`period`) AS `month`,
-						YEAR(`dp`.`period`) AS `year`,
-						`dp`.`total_children` AS `total_positive_children`,
-						`dp`.`children_positivity` AS `children_positivity`
-					FROM `dhis_calc_positive` `dp`
-					WHERE `dp`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
+						MONTH(`dcp`.`period`) AS `month`,
+						YEAR(`dcp`.`period`) AS `year`,
+						`dcp`.`total_children` AS `total_positive_children`,
+						(`dcp`.`total_children`/`dct`.`total_children`) AS `children_positivity`
+					FROM `dhis_calc_positive` `dcp`, `dhis_calc_tests` `dct`
+					$addition";
 			$positive = $this->db->query($sql)->result_array();
-
+			
 			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
 
 			$data["child_pos"][0]["name"] = 'positive';
@@ -253,7 +290,7 @@
 				//Generating the points for the positive line
 				foreach ($positive as $key1 => $value1) {
 					if( (int)$value == (int) $value1["month"]){
-						$data["child_pos"][1]["data"][$key]	=  (int) $value1["children_positivity"];
+						$data["child_pos"][1]["data"][$key]	=  ((int) $value1["children_positivity"]*100);
 					}
 				}
 				$data["child_pos"][1]["tooltip"] = array('valueSuffix' => '%' );
@@ -263,19 +300,26 @@
 		}
 
 		function adults_positive(){
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$addition = "WHERE `dcp`.`county_ID` = $cid AND YEAR(`dcp`.`period`) = $year AND `dct`.`county_ID` = $cid AND YEAR(`dct`.`period`) = $year";
+			} else {
+				$addition = "WHERE `dcp`.`sub_county_ID` = $sid AND YEAR(`dcp`.`period`) = $year AND `dct`.`sub_county_ID` = $sid AND YEAR(`dct`.`period`) = $year";
+			}
 
 			// Getting the DHIS positives in the selected county
 			$sql = "SELECT
-						MONTH(`dp`.`period`) AS `month`,
-						YEAR(`dp`.`period`) AS `year`,
-						`dp`.`total_adults` AS `total_positive_adults`,
-						`dp`.`adults_positivity` AS `adults_positivity`
-					FROM `dhis_calc_positive` `dp`
-					WHERE `dp`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
+						MONTH(`dcp`.`period`) AS `month`,
+						YEAR(`dcp`.`period`) AS `year`,
+						`dcp`.`total_adults` AS `total_positive_adults`,
+						(`dcp`.`total_adults`/`dct`.`total_adults`) AS `adults_positivity`
+					FROM `dhis_calc_positive` `dcp`, `dhis_calc_tests` `dct`
+					$addition";
 			$positive = $this->db->query($sql)->result_array();
-
+			
 			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
 
 			$data["adult_pos"][0]["name"] = 'positive';
@@ -302,7 +346,7 @@
 				//Generating the points for the positive line
 				foreach ($positive as $key1 => $value1) {
 					if( (int)$value == (int) $value1["month"]){
-						$data["adult_pos"][1]["data"][$key]	=  (int) $value1["adults_positivity"];
+						$data["adult_pos"][1]["data"][$key]	=  (int) ($value1["adults_positivity"]*100);
 					}
 				}
 				$data["adult_pos"][1]["tooltip"] = array('valueSuffix' => '%' );
@@ -313,8 +357,17 @@
 
 		function children_enrollment()
 		{
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$additionpositive = "WHERE `dp`.`county_ID` = $cid AND YEAR(`period`) = $year";
+				$additionenrolled = "WHERE `de`.`county_ID` = $cid AND YEAR(`period`) = $year";
+			} else {
+				$additionpositive = "WHERE `dp`.`sub_county_ID` = $sid AND YEAR(`period`) = $year";
+				$additionenrolled = "WHERE `de`.`sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			}
 
 			//Getting the number of children positive for the selected county
 			$sql = "SELECT
@@ -322,7 +375,7 @@
 						YEAR(`dp`.`period`) AS `year`,
 						`dp`.`cum_children` AS `cumulative_positive_children`
 					FROM `dhis_calc_positive` `dp`
-					WHERE `dp`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
+					$additionpositive";
 			$positive = $this->db->query($sql)->result_array();
 
 			$sql = "SELECT
@@ -330,7 +383,7 @@
 						YEAR(`de`.`period`) AS `year`,
 						`de`.`cum_enrl_care_peds` AS `cumulative_enrolled_children`
 					FROM `dhis_calc_enrollment` `de`
-					WHERE `de`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
+					$additionenrolled";
 			$enrolled = $this->db->query($sql)->result_array();
 
 			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
@@ -360,8 +413,17 @@
 
 		function adults_enrollment()
 		{
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$additionpositive = "WHERE `dp`.`county_ID` = $cid AND YEAR(`period`) = $year";
+				$additionenrolled = "WHERE `de`.`county_ID` = $cid AND YEAR(`period`) = $year";
+			} else {
+				$additionpositive = "WHERE `dp`.`sub_county_ID` = $sid AND YEAR(`period`) = $year";
+				$additionenrolled = "WHERE `de`.`sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			}
 
 			//Getting the number of children positive for the selected county
 			$sql = "SELECT
@@ -369,7 +431,7 @@
 						YEAR(`dp`.`period`) AS `year`,
 						`dp`.`cum_adults` AS `cumulative_positive_adults`
 					FROM `dhis_calc_positive` `dp`
-					WHERE `dp`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
+					$additionpositive";
 			$positive = $this->db->query($sql)->result_array();
 
 			$sql = "SELECT
@@ -377,7 +439,7 @@
 						YEAR(`de`.`period`) AS `year`,
 						`de`.`cum_enrl_care_adults` AS `cumulative_enrolled_adults`
 					FROM `dhis_calc_enrollment` `de`
-					WHERE `de`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
+					$additionenrolled";
 			$enrolled = $this->db->query($sql)->result_array();
 
 			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
@@ -407,15 +469,24 @@
 
 		function total_enrollment()
 		{
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$additionpositive = "WHERE `dp`.`county_ID` = $cid AND YEAR(`period`) = $year";
+				$additionenrolled = "WHERE `de`.`county_ID` = $cid AND YEAR(`period`) = $year";
+			} else {
+				$additionpositive = "WHERE `dp`.`sub_county_ID` = $sid AND YEAR(`period`) = $year";
+				$additionenrolled = "WHERE `de`.`sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			}
 
 			//Getting the number of children positive for the selected county
 			$sql = "SELECT
 						MONTH(`dp`.`period`) AS `month`,
 						YEAR(`dp`.`period`) AS `year`
 					FROM `dhis_calc_positive` `dp`
-					WHERE `dp`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
+					$additionpositive";
 			$positive = $this->db->query($sql)->result_array();
 
 			$sql = "SELECT
@@ -423,7 +494,7 @@
 						YEAR(`de`.`period`) AS `year`,
 						`de`.`cum_enrl_care_total` AS `cumulative_enrolled_total`
 					FROM `dhis_calc_enrollment` `de`
-					WHERE `de`.`county_ID` = '$id' AND YEAR(`period`) = '$year'";
+					$additionenrolled";
 			$enrolled = $this->db->query($sql)->result_array();
 
 			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
@@ -476,8 +547,15 @@
 
 		function estimated_children_identification()
 		{
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$addition = "WHERE YEAR(`period`) = $year AND `county_ID` = $cid";
+			} else {
+				$addition = "WHERE YEAR(`period`) = $year AND `sub_county_ID` = $sid";
+			}
 			
 			//Getting the children target
 			$targets = $this->get_target_lines($year);
@@ -487,7 +565,7 @@
 						MONTH(`period`) AS `month`,
 						YEAR(`period`) AS `year`
 					FROM `dhis_calc_art`
-					WHERE YEAR(`period`) = '$year' AND `county_ID` = '$id'";
+					$addition";
 			$incare = $this->db->query($sql)->result_array();
 
 			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
@@ -513,8 +591,15 @@
 		
 		function estimate_adults_identification()
 		{
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$addition = "WHERE YEAR(`period`) = $year AND `county_ID` = $cid";
+			} else {
+				$addition = "WHERE YEAR(`period`) = $year AND `sub_county_ID` = $sid";
+			}
 			
 			//Getting the number of children positive for the selected county
 			$targets = $this->get_target_lines($year);
@@ -524,7 +609,7 @@
 						MONTH(`period`) AS `month`,
 						YEAR(`period`) AS `year`
 					FROM `dhis_calc_art`
-					WHERE YEAR(`period`) = '$year' AND `county_ID` = '$id'";
+					$addition";
 			$incare = $this->db->query($sql)->result_array();
 
 			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
@@ -549,8 +634,15 @@
 
 		function estimate_total_identification()
 		{
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$addition = "WHERE YEAR(`period`) = $year AND `county_ID` = $cid";
+			} else {
+				$addition = "WHERE YEAR(`period`) = $year AND `sub_county_ID` = $sid";
+			}
 			
 			//Getting the number of children positive for the selected county
 			$targets = $this->get_target_lines($year);
@@ -560,7 +652,7 @@
 						MONTH(`period`) AS `month`,
 						YEAR(`period`) AS `year`
 					FROM `dhis_calc_art`
-					WHERE YEAR(`period`) = '$year' AND `county_ID` = '$id'";
+					$addition";
 			$inneed = $this->db->query($sql)->result_array();
 
 			$months = array(1,2,3,4,5,6,7,8,9,10,11,12);

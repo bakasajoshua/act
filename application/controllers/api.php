@@ -172,7 +172,7 @@ class api extends MX_Controller
 		// echo "<pre>";print_r($new);die();
 		//Getting back the aggregated values from the raw data
 		$insert_data = $this->sub_formating_data($new);
-		echo "<pre>";print_r($insert_data);die();
+		// echo "<pre>";print_r($insert_data);die();
 		$insert = $this->api_model->dhis_insert_aggregation($insert_data);
 	}
 
@@ -235,6 +235,7 @@ class api extends MX_Controller
 		//		Positive
 		//		Enrollment
 		//		ART
+		$newdata['cascade'] = $this->calculate_cascades($data);
 		$newdata['tests'] = $this->calculate_dhis_tests($data);
 		$newdata['positive'] = $this->calculate_dhis_positive($data);
 		// $newdata['enrollment'] = $this->calculate_dhis_enrollment($data);
@@ -243,6 +244,11 @@ class api extends MX_Controller
 		// echo "<pre>";print_r($newdata['art']);die();
 
 		return $newdata;
+	}
+
+	function calculate_cascades($data)
+	{
+
 	}
 
 	function calculate_dhis_tests($data){
@@ -318,6 +324,7 @@ class api extends MX_Controller
 	}
 
 	function calculate_dhis_positive($data){
+		// echo "<pre>";print_r($data);die();
 		$cum_children=0;
 		$cum_adults=0;
 		$next = NULL;
@@ -373,7 +380,7 @@ class api extends MX_Controller
 			$total_adults = @$value['vctclientshiv+ve(15-24yrs,female)']+@$value['vctclientshiv+ve(female,>25yrs)']+@$value['vctclientshiv+ve(15-24yrs,male)']+@$value['vctclientshiv+ve(male,>25yrs)'];
 			$cum_children= (@$cum_children+@$total_children);
 			$cum_adults = (@$cum_adults+@$total_adults);
-			$pregnant_mothers = ($value['anc_pos']+$value['lab_dev_pos']+$value['pnc_pos']+$value['monthers_ks']);
+			$pregnant_mothers = (@$value['antenatalpositivetohivtest']+@$value['labouranddeliverypostivetohivtest']+@$value['postnatal(within72hrs)postivetohivtest']);
 
 			//Positive Data Structuring
 			$dhis_positive[$key] = array(
@@ -385,12 +392,12 @@ class api extends MX_Controller
 						'total_adults' => $total_adults,
 						'cum_children' => $cum_children,
 						'cum_adults' => $cum_adults,
-						'hiv_pos_tb_patients' => $value['hiv_pos_tb_patients'],
+						'hiv_pos_tb_patients' => $value['tbpatientshiv+ve'],
 						'pregnant_mothers' => $pregnant_mothers
 					);
 			
 		}
-		echo "<pre>";print_r($dhis_positive);die();
+		// echo "<pre>";print_r($dhis_positive);die();
 		return $dhis_positive;
 	}
 

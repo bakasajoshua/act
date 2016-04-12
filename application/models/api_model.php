@@ -79,6 +79,13 @@ class api_model extends CI_Model
 
     function cascade_insert($data)
     {
+        if($this->db->get('cascade')->result_array())
+        {
+            foreach ($data as $key => $value) {
+                $this->db->where('sub_county_ID', $value['sub_county_ID']);
+                $this->db->update('cascade', $value);
+            }
+        }
         $this->db->insert_batch('cascade', $data);
 
         return TRUE;
@@ -215,9 +222,9 @@ class api_model extends CI_Model
     	// echo "<pre>";print_r($data);
     	$tests = $this->tests_insert($data['tests']);
     	$positive = $this->positive_insert($data['positive']);
-    	$enrollment = $this->enrollment_insert($data['enrollment']);
-    	$art = $this->art_insert($data['art']);
-        $vl = $this->vl_insert($data['vl']);
+    	// $enrollment = $this->enrollment_insert($data['enrollment']);
+    	// $art = $this->art_insert($data['art']);
+     //    $vl = $this->vl_insert($data['vl']);
     	
     	return TRUE;
     }

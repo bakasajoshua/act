@@ -89,11 +89,11 @@
 						?>
 					</div>
 					<div class="row input-group">
-						<!-- <div class="col-md-8" id="sub-county">
+						<div class="col-md-8" id="sub-county">
 							<select class="btn btn-info" name="sub_county_select" id="sub_county_select">
 								<option value="0">Select Sub County</option>
 							</select>
-						</div> -->
+						</div>
 						<div class="col-md-4">
 							<button style="height:30px;" class="btn btn-primary" type="submit"> Filter </button>
 						</div>
@@ -134,37 +134,37 @@
 			
 			<div class="tab-pane fade" id="default-tab-1">
 				<div class="row">
-					<div class="col-md-4">
+					<div class="col-md-6">
 						<div class="panel panel-inverse">
 				    	    <div class="panel-body" id="container1"></div>
 						</div>	
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-6">
 						<div class="panel panel-inverse">
 				    	    <div class="panel-body" id="container2"></div>
 						</div>	
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-6">
 						<div class="panel panel-inverse">
 				    	    <div class="panel-body"  id="container3"></div>
 						</div>	
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-6">
 						<div class="panel panel-inverse">
 				    	    <div class="panel-body" id="container4"></div>
 						</div>	
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-6">
 						<div class="panel panel-inverse">
 				    	    <div class="panel-body" id="container5"></div>
 						</div>	
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-6">
 						<div class="panel panel-inverse">
 				    	    <div class="panel-body" id="container6"></div>
 						</div>	
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-6">
 						<div class="panel panel-inverse">
 				    	    <div class="panel-body" id="container7"></div>
 						</div>	
@@ -174,26 +174,26 @@
 				    	    <div class="panel-body" id="container8"></div>
 						</div>	
 					</div>
-					<div class="col-md-4">
+					<!-- <div class="col-md-6">
 						<div class="panel panel-inverse">
 				    	    <div class="panel-body" id="container9"></div>
 						</div>	
-					</div>
-					<div class="col-md-4">
+					</div> -->
+					<div class="col-md-6">
 						<div class="panel panel-inverse">
 				    	    <div class="panel-body" id="container10"></div>
 						</div>	
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-6">
 						<div class="panel panel-inverse">
 				    	    <div class="panel-body" id="container11"></div>
 						</div>	
 					</div>
-					<div class="col-md-4">
+					<!-- <div class="col-md-6">
 						<div class="panel panel-inverse">
 				    	    <div class="panel-body" id="container12"></div>
 						</div>	
-					</div>
+					</div> -->
 					
 				</div>
 			</div>
@@ -318,14 +318,14 @@
 			} else{
 				$('#sub-county').show();
 				$('#sub_county_select').children('#removable').remove();
-				/*$.get('<?php base_url();?>dashboard/ajax_get_sub_county/'+id, function(data){
+				$.get('<?php base_url();?>dashboard/ajax_get_sub_county/'+id, function(data){
 					obj=jQuery.parseJSON(data);
-					
+					console.log(data);
 					jQuery.each(obj, function(index, value){
 						$('#sub_county_select').append('<option id="removable" value="'+value.sub_county_ID+'">'+value.sub_county_name+'</option>');
 						// console.log(value.sub_county_name);
 					});
-				});*/
+				});
 			}
 			
 		});

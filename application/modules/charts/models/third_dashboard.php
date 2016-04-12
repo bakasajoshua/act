@@ -13,8 +13,15 @@ class third_dashboard extends MY_Model
 
 	function survival_retention_art()
 	{
-		$id = $this->session->userdata('county_ID');
+		$cid = $this->session->userdata('county_ID');
+		$sid = $this->session->userdata('sub_county_ID');
 		$year = $this->session->userdata('year');
+
+		if ($sid==0) {
+			$addition = "WHERE `county_ID` = $cid AND YEAR(`period`) = $year";
+		} else {
+			$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+		}
 
 		$sql = "SELECT
 					`net_overall_cohort`,
@@ -23,7 +30,7 @@ class third_dashboard extends MY_Model
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `dhis_calc_art`
-				WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'";
+				$addition";
 		$ret_art = $this->db->query($sql)->result_array();
 
 		$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
@@ -63,8 +70,15 @@ class third_dashboard extends MY_Model
 
 	function peds_vl_testing()
 	{
-		$id = $this->session->userdata('county_ID');
+		$cid = $this->session->userdata('county_ID');
+		$sid = $this->session->userdata('sub_county_ID');
 		$year = $this->session->userdata('year');
+
+		if ($sid==0) {
+			$addition = "WHERE `county_ID` = $cid AND YEAR(`period`) = $year";
+		} else {
+			$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+		}
 
 		$sql = "SELECT
 					`peds_vl_tests`,
@@ -73,7 +87,7 @@ class third_dashboard extends MY_Model
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `vl`
-				WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'";
+				$addition";
 		$peds_vl = $this->db->query($sql)->result_array();
 
 		$months = array(1,2,3,4,5,6,7,8,9,10,11,12);
@@ -110,8 +124,15 @@ class third_dashboard extends MY_Model
 
 	function adults_vl_testing()
 	{
-		$id = $this->session->userdata('county_ID');
+		$cid = $this->session->userdata('county_ID');
+		$sid = $this->session->userdata('sub_county_ID');
 		$year = $this->session->userdata('year');
+
+		if ($sid==0) {
+			$addition = "WHERE `county_ID` = $cid AND YEAR(`period`) = $year";
+		} else {
+			$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+		}
 
 		$sql = "SELECT
 					`adult_vl_tests`,
@@ -120,7 +141,7 @@ class third_dashboard extends MY_Model
 					MONTH(`period`) AS `month`,
 					YEAR(`period`) AS `year`
 				FROM `vl`
-				WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'";
+				$addition";
 		$peds_vl = $this->db->query($sql)->result_array();
 
 		$months = array(1,2,3,4,5,6,7,8,9,10,11,12);

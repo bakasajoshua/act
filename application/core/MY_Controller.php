@@ -43,16 +43,16 @@ class MY_Controller extends MX_Controller{
     	$counties = $this->db->get('counties')->result_array();
     	// echo "<pre>";print_r($counties);die();
     	$select .= '<select class="btn btn-info" id="county-select" name="county_name">';
-    	$select .= '<option value="0" selected="true">Kenya</option>';
+    	$select .= '<option value="0" selected="true"><a href="#">Kenya</a></option>';
     	$select .= '<optgroup label="Select a County">';
         if ($counties) {
     		foreach ($counties as $key => $value) {
-    			$select .= '<option value="'.$value['county_ID'].'">'.$value['county_name'].'</option>';
+               $select .= '<option value="'.$value['county_ID'].'">'.$value['county_name'].'</option>';
     		}
     	}
-    	$select .= '<optgroup label="Select a County">';
+    	$select .= '</optgroup>';
     	$select .= '</select>';
-
+        // echo "<pre>";print_r($select);die();
     	return $select;
     	
     }
@@ -70,14 +70,21 @@ class MY_Controller extends MX_Controller{
     public function filter($year)
     {
         $this->session->set_userdata('year', $year);
-
+        // echo "<pre>";print_r($this->session->all_userdata());die();
         //Setting the relevant selected county
-        if ($this->input->post('county_name'))
+        if ($this->input->post('county_name')){
             $this->session->set_userdata('county_ID', $this->input->post('county_name'));
+        }else {
+            $this->set_session_data();
+            $this->session->set_userdata('year', $year);
+        }
 
         //Setting the relevant selected Sub County
-        if ($this->input->post('sub_county_select'))
+        if ($this->input->post('sub_county_select')){
             $this->session->set_userdata('sub_county_ID', $this->input->post('sub_county_select'));
+        }else {
+            $this->session->set_userdata('sub_county_ID', 0);
+        }
         
         return TRUE;
     }

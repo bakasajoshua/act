@@ -15,8 +15,18 @@ if(!defined('BASEPATH')) exit('No direct access to script allowed!');
 
 		function cascade_children()
 		{
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			} else {
+				$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			}
+			
+			$calculated_data = array();
+
 			$clhiv = 0;
 			$childrenachievedIncare = 0;
 			$childrengapIncare = 0;
@@ -28,8 +38,18 @@ if(!defined('BASEPATH')) exit('No direct access to script allowed!');
 			$sql = "SELECT
 						*
 					FROM `cascade`
-					WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'";
+					$addition";
 			$return = $this->db->query($sql)->result_array();
+			// echo "<pre>";print_r($return);die();
+			$calculated_data = array(
+									'clhiv' 						=> 0,
+									'childrenachievedIncare' 		=> 0,
+									'childrengapIncare' 			=> 0,
+									'childrenachievedTreatment' 	=> 0,
+									'childrengapTreatment' 			=> 0,
+									'childrenachievedSuppression' 	=> 0,
+									'childrengapSuppression'		=> 0
+									);
 
 			foreach ($return as $key => $value) {
 				$calculated_data = array(
@@ -54,8 +74,18 @@ if(!defined('BASEPATH')) exit('No direct access to script allowed!');
 
 		function cascaded_adults()
 		{
-			$id = $this->session->userdata('county_ID');
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
 			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			} else {
+				$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			}
+
+			$calculated_data = array();
+
 			$adultslhiv = 0;
 			$adultsachievedIncare = 0;
 			$adultsgapIncare = 0;
@@ -67,8 +97,18 @@ if(!defined('BASEPATH')) exit('No direct access to script allowed!');
 			$sql = "SELECT
 						*
 					FROM `cascade`
-					WHERE `county_ID` = '$id' AND YEAR(`period`) = '$year'";
+					$addition";
 			$return = $this->db->query($sql)->result_array();
+
+			$calculated_data = array(
+									'adultslhiv' 				=> 0,
+									'adultsachievedIncare' 		=> 0,
+									'adultsgapIncare' 			=> 0,
+									'adultsachievedTreatment' 	=> 0,
+									'adultsgapTreatment' 		=> 0,
+									'adultsachievedSuppression' => 0,
+									'adultsgapSuppression'		=> 0
+									);
 
 			foreach ($return as $key => $value) {
 				$calculated_data = array(
@@ -90,7 +130,65 @@ if(!defined('BASEPATH')) exit('No direct access to script allowed!');
 			
 			return $data;
 		}
+
+		function cascade_total()
+		{
+			$cid = $this->session->userdata('county_ID');
+			$sid = $this->session->userdata('sub_county_ID');
+			$year = $this->session->userdata('year');
+
+			if ($sid==0) {
+				$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			} else {
+				$addition = "WHERE `sub_county_ID` = $sid AND YEAR(`period`) = $year";
+			}
+
+			$calculated_data = array();
+
+			$totallhiv = 0;
+			$totalachievedIncare = 0;
+			$totalgapIncare = 0;
+			$totalachievedTreatment = 0;
+			$totalgapTreatment = 0;
+			$totalachievedSuppression = 0;
+			$totalgapSuppression = 0;
+
+			$sql = "SELECT
+						*
+					FROM `cascade`
+					$addition";
+			$return = $this->db->query($sql)->result_array();
+
+			$calculated_data = array(
+									'totallhiv' 				=> 0,
+									'totalachievedIncare' 		=> 0,
+									'totalgapIncare' 			=> 0,
+									'totalachievedTreatment' 	=> 0,
+									'totalgapTreatment' 		=> 0,
+									'totalachievedSuppression' => 0,
+									'totalgapSuppression'		=> 0
+									);
+			
+			foreach ($return as $key => $value) {
+				$calculated_data = array(
+									'totallhiv' => @$totallhiv+@$value['adultslhiv']+@$value['clhiv'],
+									'totalachievedIncare' => @$totalachievedIncare+@$value['adultsactualforidentification']+@$value['childrenactualforidentification'],
+									'totalgapIncare' => @$totalgapIncare+(@$value['adultstargetforidentification']-@$value['adultsactualforidentification'])+(@$value['childrentargetforidentification']-@$value['childrenactualforidentification']),
+									'totalachievedTreatment' => @$totalachievedTreatment+@$value['adultsactualfortreatment']+@$value['childrenactualfortreatment'],
+									'totalgapTreatment' => @$totalgapTreatment+(@$value['adultstargetfortreatment']-@$value['adultsactualfortreatment'])+(@$value['childrentargetfortreatment']-@$value['childrenactualfortreatment']),
+									'totalachievedSuppression' => @$totalachievedSuppression+@$value['adultsactualforviralsuppression']+@$value['childrenactualforviralsuppression'],
+									'totalgapSuppression' => @$totalgapSuppression+(@$value['adultstargetforviralsuppression']-@$value['adultsactualforviralsuppression'])+(@$value['childrentargetforviralsuppression']-@$value['childrenactualforviralsuppression'])
+									);
+			}
+
+			$data["cascade_total"][0]["name"] = 'Gap';
+			$data["cascade_total"][1]["name"] = 'Achieved';
+
+			$data["cascade_total"][0]["data"] = array(NULL, (int) $calculated_data["totalgapIncare"], (int) $calculated_data["totalgapTreatment"], (int) $calculated_data["totalgapSuppression"]);
+			$data["cascade_total"][1]["data"] = array((int) $calculated_data["totallhiv"], (int) $calculated_data["totalachievedIncare"], (int) $calculated_data["totalachievedTreatment"], (int) $calculated_data["totalachievedSuppression"]);
+			
+			return $data;
+		}
 	}
 
-	
 ?>

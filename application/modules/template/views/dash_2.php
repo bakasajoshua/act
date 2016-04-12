@@ -170,17 +170,11 @@
                     }
                 }
             },
-            series: [{
-                name: 'Gap',
-                data: [null, 526236, 483019, 711266]
-            }, {
-                name: 'Achieved',
-                data: [1630939, 941609, 838042, 477689]
-            }]
+            series: <?php echo json_encode($cascaded['cascaded_total']['cascade_total']);?>
         });
     });
 
-/*	$(function () {
+	$(function () {
         $('#container1').highcharts({
             title: {
                 text: 'Cumulative: Number of Infants tested for HIV',
@@ -461,8 +455,7 @@ $(function () {
             },
             series: <?php echo json_encode($first_ninety['adults_positivity']['adult_pos'])?>
         });
-    });
-    
+    });   
 
 $(function () {
         $('#container7').highcharts({
@@ -538,7 +531,7 @@ $(function () {
         });
     });
 
-$(function () {
+/*$(function () {
         $('#container9').highcharts({
             title: {
                 text: 'Cumulative: Total Enrolled in Care',
@@ -573,7 +566,7 @@ $(function () {
             },
             series: <?php echo json_encode($first_ninety['total_positive_enrolled']['total_posen'])?>
         });
-    });
+    });*/
 
 $(function () {
         $('#container10').highcharts({
@@ -649,7 +642,7 @@ $(function () {
         });
     });
 
-$(function () {
+/*$(function () {
         $('#container12').highcharts({
             title: {
                 text: '1st 90: Estimated Overall Need for Identification',
@@ -684,7 +677,7 @@ $(function () {
             },
             series: <?php echo json_encode($first_ninety['estimated_total_inneed_identification']['total_care']);?>
         });
-    });
+    });*/
 
 $(function () {
         $('#container13').highcharts({
@@ -1088,9 +1081,6 @@ $(function () {
         });
     });
 
-
-
-
 $(function () {
         $('#container22').highcharts({
             chart: {
@@ -1455,7 +1445,6 @@ $(function () {
                 data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2]
             }]
         });
-    });*/
-    
+    });   
     
 </script>
